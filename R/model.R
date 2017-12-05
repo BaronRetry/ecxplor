@@ -385,6 +385,9 @@ runModel <- function(data_tag, product_code_rev, product_code_digit, year, ab_fl
     message_text <- paste0("All done! ", Sys.time())
     updateMessage(message_text)
 
+    model[["product_info"]] <- loadProductInfoPanels(hs_rev_year, hs_rev_digit)[[1]] %>% filter(product %in% rownames(phi))
+    model[["country_info"]] <- loadBACICountryInfoPanel()
+
     model[["data_tag"]] <- data_tag
     model[["product_code_rev"]] <- product_code_rev
     model[["product_code_digit"]] <- product_code_digit

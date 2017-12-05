@@ -20,6 +20,19 @@ phi_cutoff <- 0.55
 
 model_object <- runModel("baci", hs_rev_year, hs_rev_digit, input_year, TRUE)
 
+choices <- rownames(model_object[["proximity"]])
+choices_panel <- tbl_df(data.frame(product = choices,
+                                   stringsAsFactors = FALSE))
+product_info_panel <- model_object[["product_info"]]
+
+choices_info_panel <- tbl_df(merge(choices_panel, product_info_panel, all.x = TRUE))
+choices_to_display <- choices_info_panel[["product"]]
+names(choices_to_display) <- choices_info_panel[["name"]]
+unnamed_choices_to_display <- choices_to_display[is.na(names(choices_to_display))]
+named_choices_to_display <- choices_to_display[!is.na(names(choices_to_display))]
+
+names(unnamed_choices_to_display) <- unnamed_choices_to_display
+final_choices_to_display <- c(named_choices_to_display, unnamed_choices_to_display)
 
 
 ui <- fluidPage(
@@ -30,15 +43,16 @@ ui <- fluidPage(
 
         sidebarPanel(
 
-            selectInput(inputId = "focus_product",
-                        label = "Product focus:",
-                        choices = rownames(model_object[["proximity"]])),
+            selectizeInput(inputId = "focus_product",
+                           label = "Product focus:",
+                           choices = final_choices_to_display,
+                           multiple = FALSE,
+                           options = list(maxItems = 6000)),
             sliderInput(inputId = "search_depth",
                         label = "Search depth:",
                         min = 1,
                         max = 25,
                         value = 10)
-
 
         ),
 
