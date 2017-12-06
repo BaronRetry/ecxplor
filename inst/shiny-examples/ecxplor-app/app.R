@@ -23,6 +23,7 @@ model_object <- runModel("baci", hs_rev_year, hs_rev_digit, input_year, TRUE)
 choices <- rownames(model_object[["proximity"]])
 choices_panel <- tbl_df(data.frame(product = choices,
                                    stringsAsFactors = FALSE))
+
 product_info_panel <- model_object[["product_info"]]
 
 choices_info_panel <- tbl_df(merge(choices_panel, product_info_panel, all.x = TRUE))
@@ -34,6 +35,7 @@ named_choices_to_display <- choices_to_display[!is.na(names(choices_to_display))
 names(unnamed_choices_to_display) <- unnamed_choices_to_display
 final_choices_to_display <- c(named_choices_to_display, unnamed_choices_to_display)
 
+exports_panel <- model_object[["exports"]]
 
 ui <- fluidPage(
 
@@ -43,11 +45,10 @@ ui <- fluidPage(
 
         sidebarPanel(
 
-            selectizeInput(inputId = "focus_product",
-                           label = "Product focus:",
-                           choices = final_choices_to_display,
-                           multiple = FALSE,
-                           options = list(maxItems = 6000)),
+            selectInput(inputId = "focus_product",
+                        label = "Product focus:",
+                        choices = final_choices_to_display,
+                        multiple = FALSE),
             sliderInput(inputId = "search_depth",
                         label = "Search depth:",
                         min = 1,
@@ -58,7 +59,9 @@ ui <- fluidPage(
 
         mainPanel(
 
-            forceNetworkOutput(outputId = "product_space_plot")
+            forceNetworkOutput(outputId = "product_space_plot"),
+            tableOutput(outputId = "product_focus_info"),
+            tableOutput(outputId = "exports_focus_info")
 
         )
 
@@ -86,6 +89,16 @@ server <- function(input, output) {
 
 
     })
+
+    output$product_focus_info <- renderTable(
+        product_info_panel %>% filter(product == input$focus_product)
+    )
+
+    output$exports_focus_info <- renderTable(
+        exports_panel %>% filter(product == input$focus_product) %>%
+        arrange(year, country, product) %>%
+        select(year, country, product)
+    )
 
 
 }
