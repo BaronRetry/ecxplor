@@ -52,8 +52,8 @@ ui <- fluidPage(
             sliderInput(inputId = "search_depth",
                         label = "Search depth:",
                         min = 1,
-                        max = 25,
-                        value = 10)
+                        max = 1000,
+                        value = 50)
 
         ),
 
@@ -97,7 +97,7 @@ server <- function(input, output) {
     output$exports_focus_info <- renderTable(
         exports_panel %>% filter(product == input$focus_product) %>%
         arrange(year, country, product) %>%
-        select(year, country, product)
+        select(year, country, export_val)
     )
 
 
