@@ -7,58 +7,108 @@ goa_data_path <- paste0(master_data_path, "GOA/")
 oec_data_path <- paste0(master_data_path, "Observatory of Economic Complexity/")
 baci_data_path <- paste0(master_data_path, "BACI/")
 
-## loadProductInfoPanels
-##
-## Load the product_hs files from the Observatory for a given list of hs_rev_years
-## and hs_rev_digits.
+oec_data_filenames <- c("year_origin_hs92_4.tsv.bz2" = FALSE,
+                        "year_origin_hs92_6.tsv.bz2" = FALSE,
+                        "year_origin_hs96_4.tsv.bz2" = FALSE,
+                        "year_origin_hs96_6.tsv.bz2" = FALSE,
+                        "year_origin_hs02_4.tsv.bz2" = FALSE,
+                        "year_origin_hs02_6.tsv.bz2" = FALSE,
+                        "year_origin_hs07_4.tsv.bz2" = FALSE,
+                        "year_origin_hs07_6.tsv.bz2" = FALSE)
 
-loadProductInfoPanels <- function(hs_rev_years, hs_rev_digit) {
+oec_info_filenames <- c("products_hs_92.tsv.bz2" = FALSE,
+                        "products_hs_96.tsv.bz2" = FALSE,
+                        "products_hs_02.tsv.bz2" = FALSE,
+                        "products_hs_07.tsv.bz2" = FALSE)
 
-    product_panels <- list()
+oec_base_url <- "https://atlas.media.mit.edu/"
 
-    for (hs_rev_year in hs_rev_years) {
+checkDataDirectory <- function() {
 
-        hs_rev_tag <- substr(hs_rev_year, 3, 4)
-        hs_code_colname <- paste0("hs", hs_rev_tag)
+    data_filenames <- dir(path.package("ecxplor", "data"))
 
-        product_file_path <- paste0(oec_data_path, "products_hs_", hs_rev_tag, ".tsv")
+    oec_data_filenames[oec_data_filenames %in% data_filenames] <- TRUE
+    oec_info_filenames[oec_info_filenames %in% data_filenames] <- TRUE
 
-        print(product_file_path)
+}
 
-        product_panel <- tbl_df(read.csv(product_file_path,
-                                         header = TRUE,
-                                         sep = "\t",
-                                         quote = "\"",
-                                         colClasses = c("character", "character", "character"),
-                                         stringsAsFactors = FALSE,
-                                         na.string = c("NULL")))
 
-        new_data_names <- gsub(hs_code_colname, "product", names(product_panel))
-        names(product_panel) <- new_data_names
+downloadOECData <- function(hs_rev_year, hs_rev_digit) {
 
-        digit_products <- c()
+    hs_rev_code <- substr(hs_rev_year, 3, 4)
 
-        if (hs_rev_digit == "4") {
-            digit_products <- product_panel[["product"]][nchar(product_panel[["product"]]) == 4]
-        } else if (hs_rev_digit == "6") {
-            digit_products <- product_panel[["product"]][nchar(product_panel[["product"]]) == 6]
-        }
+    oec_data_filename <- paste0("year_origin_hs,"
+                                hs_rev_code,
+                                "_", hs_rev_digits,
+                                ".tsv.bz2")
 
-        nice_product_panel <- product_panel[product_panel["product"] == digit_products, ]
+    oec_data_url <- paste0(oec_base_address,
+                           "/static/db/raw/",
+                           oec_data_filename)
 
-        product_panels[[hs_rev_year]] <- product_panel
+    download.file(oec_data_url, file.path(path.package("ecxplor", "data"),
+                                          oec_data_filename))
 
+    oec_data_filenames[oec_data_filenames == oec_data_filename] <- TRUE
+
+}
+
+downloadOECInfo <- function(hs_rev_year, hs_rev_digit) {
+
+    oec_base_url <- "https://atlas.media.mit.edu/"
+
+    hs_rev_code <- substr(hs_rev_year, 3, 4)
+
+    oec_info_filename <- paste0("products_hs,"
+                                hs_rev_code,
+                                "_", hs_rev_digits,
+                                ".tsv.bz2")
+
+    oec_info_url <- paste0(oec_base_address,
+                           "/static/db/raw/",
+                           oec_info_filename)
+
+    download.file(oec_data_url, file.path(path.package("ecxplor",
+                                                       "data",
+                                                       oec_info_filename)))
+
+}
+
+loadOECInfoPanel <- function(hs_rev_year, hs_rev_digit) {
+
+    hs_rev_tag <- substr(hs_rev_year, 3, 4)
+    hs_code_colname <- paste0("hs", hs_rev_tag)
+
+    product_file_path <- paste0(oec_data_path, "products_hs_", hs_rev_tag, ".tsv")
+
+    print(product_file_path)
+
+    product_panel <- tbl_df(read.csv(product_file_path,
+                                     header = TRUE,
+                                     sep = "\t",
+                                     quote = "\"",
+                                     colClasses = c("character", "character", "character"),
+                                     stringsAsFactors = FALSE,
+                                     na.string = c("NULL")))
+
+    new_data_names <- gsub(hs_code_colname, "product", names(product_panel))
+    names(product_panel) <- new_data_names
+
+    digit_products <- c()
+
+    if (hs_rev_digit == "4") {
+        digit_products <- product_panel[["product"]][nchar(product_panel[["product"]]) == 4]
+    } else if (hs_rev_digit == "6") {
+        digit_products <- product_panel[["product"]][nchar(product_panel[["product"]]) == 6]
     }
+
+    nice_product_panel <- product_panel[product_panel["product"] == digit_products, ]
+
+    product_panels[[hs_rev_year]] <- product_panel
 
     return(product_panels)
 
 }
-
-## loadObservatoryTradePanels
-##
-## Load the Observatory exports for a given set of hs_rev_years and hs_digits.
-## trade_tag is a variable that, when set to "export", loads export data, and
-## loads the bilateral data otherwise.
 
 loadObservatoryTradePanels <- function(hs_rev_years, hs_digits, trade_tag) {
 
@@ -118,9 +168,6 @@ loadObservatoryTradePanels <- function(hs_rev_years, hs_digits, trade_tag) {
 
 }
 
-## loadBACICountryInfoPanel
-##
-## Load the file country_code_baci12.csv from the BACI data folder.
 
 loadBACICountryInfoPanel <- function() {
 
