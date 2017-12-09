@@ -37,7 +37,7 @@ downloadOECData <- function(hs_rev_year, hs_rev_digit) {
 
     hs_rev_code <- substr(hs_rev_year, 3, 4)
 
-    oec_data_filename <- paste0("year_origin_hs,"
+    oec_data_filename <- paste0("year_origin_hs",
                                 hs_rev_code,
                                 "_", hs_rev_digits,
                                 ".tsv.bz2")
@@ -59,7 +59,7 @@ downloadOECInfo <- function(hs_rev_year, hs_rev_digit) {
 
     hs_rev_code <- substr(hs_rev_year, 3, 4)
 
-    oec_info_filename <- paste0("products_hs,"
+    oec_info_filename <- paste0("products_hs",
                                 hs_rev_code,
                                 "_", hs_rev_digits,
                                 ".tsv.bz2")
