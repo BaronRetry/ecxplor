@@ -1,31 +1,21 @@
-## This line needs to be changed to the location of the export data.
-master_data_path <- "/Users/smyrna/Data/"
-## master_data_path <- "C:/Users/smyrna/Data/"
-
-## Folder structure is as required below.
-goa_data_path <- paste0(master_data_path, "GOA/")
-oec_data_path <- paste0(master_data_path, "Observatory of Economic Complexity/")
-baci_data_path <- paste0(master_data_path, "BACI/")
-
-oec_data_filenames <- c("year_origin_hs92_4.tsv.bz2" = FALSE,
-                        "year_origin_hs92_6.tsv.bz2" = FALSE,
-                        "year_origin_hs96_4.tsv.bz2" = FALSE,
-                        "year_origin_hs96_6.tsv.bz2" = FALSE,
-                        "year_origin_hs02_4.tsv.bz2" = FALSE,
-                        "year_origin_hs02_6.tsv.bz2" = FALSE,
-                        "year_origin_hs07_4.tsv.bz2" = FALSE,
-                        "year_origin_hs07_6.tsv.bz2" = FALSE)
-
-oec_info_filenames <- c("products_hs_92.tsv.bz2" = FALSE,
-                        "products_hs_96.tsv.bz2" = FALSE,
-                        "products_hs_02.tsv.bz2" = FALSE,
-                        "products_hs_07.tsv.bz2" = FALSE)
-
-oec_base_url <- "https://atlas.media.mit.edu/"
-
 checkDataDirectory <- function() {
 
     data_filenames <- dir(path.package("ecxplor", "data"))
+
+    oec_data_filenames <- c("year_origin_hs92_4.tsv.bz2" = FALSE,
+                            "year_origin_hs92_6.tsv.bz2" = FALSE,
+                            "year_origin_hs96_4.tsv.bz2" = FALSE,
+                            "year_origin_hs96_6.tsv.bz2" = FALSE,
+                            "year_origin_hs02_4.tsv.bz2" = FALSE,
+                            "year_origin_hs02_6.tsv.bz2" = FALSE,
+                            "year_origin_hs07_4.tsv.bz2" = FALSE,
+                            "year_origin_hs07_6.tsv.bz2" = FALSE)
+
+    oec_info_filenames <- c("products_hs_92.tsv.bz2" = FALSE,
+                            "products_hs_96.tsv.bz2" = FALSE,
+                            "products_hs_02.tsv.bz2" = FALSE,
+                            "products_hs_07.tsv.bz2" = FALSE)
+
 
     oec_data_filenames[oec_data_filenames %in% data_filenames] <- TRUE
     oec_info_filenames[oec_info_filenames %in% data_filenames] <- TRUE
@@ -34,6 +24,8 @@ checkDataDirectory <- function() {
 
 
 downloadOECData <- function(hs_rev_year, hs_rev_digit) {
+
+    oec_base_url <- "https://atlas.media.mit.edu/"
 
     hs_rev_code <- substr(hs_rev_year, 3, 4)
 

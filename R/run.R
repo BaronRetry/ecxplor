@@ -6,9 +6,9 @@ library(shiny)
 ## load.R contains definitions specifying where and which data to load.
 ## model.R contains the definitions of runModel() and its components.
 ## output.R contains the definition of generateBasicOutput().
-source(file.path(path.package("ecxplor"), "R", "load.R"))
-source(file.path(path.package("ecxplor"), "R", "model.R"))
-source(file.path(path.package("ecxplor"), "R", "output.R"))
+source("load.R"))
+source("model.R"))
+source("output.R"))
 
 
 ## Run 6-digit BACI model for 2014 (including AB) and generate output.
