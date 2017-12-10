@@ -31,17 +31,14 @@ downloadOECData <- function(hs_rev_year, hs_rev_digit) {
 
     oec_data_filename <- paste0("year_origin_hs",
                                 hs_rev_code,
-                                "_", hs_rev_digits,
+                                "_", hs_rev_digit,
                                 ".tsv.bz2")
 
-    oec_data_url <- paste0(oec_base_address,
+    oec_data_url <- paste0(oec_base_url,
                            "/static/db/raw/",
                            oec_data_filename)
 
-    download.file(oec_data_url, file.path(path.package("ecxplor", "data"),
-                                          oec_data_filename))
-
-    oec_data_filenames[oec_data_filenames == oec_data_filename] <- TRUE
+    download.file(url = oec_data_url, destfile = file.path(path.package("ecxplor"), "data", oec_data_filename))
 
 }
 
@@ -53,16 +50,16 @@ downloadOECInfo <- function(hs_rev_year, hs_rev_digit) {
 
     oec_info_filename <- paste0("products_hs",
                                 hs_rev_code,
-                                "_", hs_rev_digits,
+                                "_", hs_rev_digit,
                                 ".tsv.bz2")
 
-    oec_info_url <- paste0(oec_base_address,
+    oec_info_url <- paste0(oec_base_url,
                            "/static/db/raw/",
                            oec_info_filename)
 
-    download.file(oec_data_url, file.path(path.package("ecxplor",
-                                                       "data",
-                                                       oec_info_filename)))
+    download.file(oec_info_url, file.path(path.package("ecxplor"),
+                                          "data",
+                                          oec_info_filename))
 
 }
 
