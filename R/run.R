@@ -23,4 +23,4 @@ library(shiny)
 ## ## Run 4-digit OEC model for 2014 (excluding AB).
 ## oec_1996_6digit_2014_ab <- runModel("oec", "1996", "4", 2014, FALSE)
 
-runApp("simple-app")
+## runApp("simple-app")
