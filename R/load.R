@@ -1,29 +1,4 @@
-checkDataDirectory <- function() {
-
-    data_filenames <- dir(path.package("ecxplor", "data"))
-
-    oec_data_filenames <- c("year_origin_hs92_4.tsv.bz2" = FALSE,
-                            "year_origin_hs92_6.tsv.bz2" = FALSE,
-                            "year_origin_hs96_4.tsv.bz2" = FALSE,
-                            "year_origin_hs96_6.tsv.bz2" = FALSE,
-                            "year_origin_hs02_4.tsv.bz2" = FALSE,
-                            "year_origin_hs02_6.tsv.bz2" = FALSE,
-                            "year_origin_hs07_4.tsv.bz2" = FALSE,
-                            "year_origin_hs07_6.tsv.bz2" = FALSE)
-
-    oec_info_filenames <- c("products_hs_92.tsv.bz2" = FALSE,
-                            "products_hs_96.tsv.bz2" = FALSE,
-                            "products_hs_02.tsv.bz2" = FALSE,
-                            "products_hs_07.tsv.bz2" = FALSE)
-
-
-    oec_data_filenames[oec_data_filenames %in% data_filenames] <- TRUE
-    oec_info_filenames[oec_info_filenames %in% data_filenames] <- TRUE
-
-}
-
-
-downloadOECData <- function(hs_rev_year, hs_rev_digit) {
+downloadOECExports <- function(hs_rev_year, hs_rev_digit) {
 
     oec_base_url <- "https://atlas.media.mit.edu/"
 
@@ -38,13 +13,15 @@ downloadOECData <- function(hs_rev_year, hs_rev_digit) {
                            "/static/db/raw/",
                            oec_data_filename)
 
-    download.file(url = oec_data_url, destfile = file.path(path.package("ecxplor"), "data", oec_data_filename))
+    download.file(url = oec_data_url, destfile = file.path(path.package("ecxplor"),
+                                                           "data",
+                                                           oec_data_filename))
 
 }
 
-downloadOECInfo <- function(hs_rev_year, hs_rev_digit) {
+downloadOECProductsInfo <- function(hs_rev_year, hs_rev_digit) {
 
-    oec_base_url <- "https://atlas.media.mit.edu/"
+    oec_base_url <- "https://atlas.media.mit.edu"/
 
     hs_rev_code <- substr(hs_rev_year, 3, 4)
 
@@ -53,9 +30,7 @@ downloadOECInfo <- function(hs_rev_year, hs_rev_digit) {
                                 "_", hs_rev_digit,
                                 ".tsv.bz2")
 
-    oec_info_url <- paste0(oec_base_url,
-                           "/static/db/raw/",
-                           oec_info_filename)
+    oec_info_url <- paste0(oec_base_url, "/static/db/raw/", oec_info_filename)
 
     download.file(oec_info_url, file.path(path.package("ecxplor"),
                                           "data",
@@ -63,14 +38,70 @@ downloadOECInfo <- function(hs_rev_year, hs_rev_digit) {
 
 }
 
-loadOECInfoPanel <- function(hs_rev_year, hs_rev_digit) {
+downloadOECCountriesInfo <- function() {
+
+    oec_base_url <- "https://atlas.media.mit.edu/"
+
+    oec_countries_filename <- "country_names.tsv.bz2"
+    oec_countries_url <- paste0(oec_base_url, oec_countries_filename)
+    download.file(oec_countries_url, file.path(path.package("ecxplor"),
+                                               "data",
+                                               oec_countries_filename))
+
+}
+
+
+
+downloadBACIExports <- function(rev_year) {
+
+    baci_base_url <- "http://talentedco.in/Data/BACI"
+
+    baci_data_filename <- paste0("baci12_",
+                                 rev_year,
+                                 ".csv")
+
+    baci_data_url <- paste0(baci_base_url,
+                            baci_data_filename)
+
+    download.file(url = baci_data_url, destfile = file.path(path.package("ecxplor"),
+                                                            "data",
+                                                            baci_data_filename))
+
+}
+
+downloadBACIProductsInfo <- function(hs_rev_year, hs_rev_digit) {
+
+
+}
+
+downloadBACICountriesInfo <- function() {
+
+    baci_base_url <- "http://talentedco.in/Data/BACI"
+
+    baci_countries_filename <- "country_code_baci12.csv"
+    baci_countries_url <- paste0(baci_base_url, baci_countries_filename)
+    download.file(baci_countries_url, file.path(path.package("ecxplor"),
+                                                "data",
+                                                baci_countries_filename))
+
+}
+
+loadOECProductsInfoPanel <- function(hs_rev_year, hs_rev_digit) {
 
     hs_rev_tag <- substr(hs_rev_year, 3, 4)
     hs_code_colname <- paste0("hs", hs_rev_tag)
 
-    product_file_path <- paste0(oec_data_path, "products_hs_", hs_rev_tag, ".tsv")
+    oec_info_filename <- paste0("products_hs",
+                                hs_rev_code,
+                                "_", hs_rev_digit,
+                                ".tsv.bz2")
 
-    print(product_file_path)
+
+    product_file_path <- file.path(path.package("ecxplor"), "data", oec_info_filename)
+
+    if (!(file.exists(product_file_path))) {
+        downloadOECInfo(hs_rev_year, hs_rev_digit)
+    }
 
     product_panel <- tbl_df(read.csv(product_file_path,
                                      header = TRUE,
@@ -93,102 +124,72 @@ loadOECInfoPanel <- function(hs_rev_year, hs_rev_digit) {
 
     nice_product_panel <- product_panel[product_panel["product"] == digit_products, ]
 
-    product_panels[[hs_rev_year]] <- product_panel
-
-    return(product_panels)
+    return(nice_product_panel)
 
 }
 
-loadObservatoryTradePanels <- function(hs_rev_years, hs_digits, trade_tag) {
+loadOECExportsPanel <- function(hs_rev_year, hs_rev_digit) {
 
-    trade_panels <- list()
+    hs_rev_tag <- substr(hs_rev_year, 3, 4)
+    hs_code_colname <- paste0("hs", hs_rev_tag)
 
-    for (hs_rev_year in hs_rev_years) {
+    data_file_prefix = "year_origin_hs"
+    col_classes <- c("integer", "factor", "factor", "numeric", "numeric", "numeric", "numeric")
+    col_names <- c("year", "origin", "product", "export_val", "import_val", "export_rca", "import_rca")
 
-        hs_rev_group <- list()
+    oec_exports_filename <- paste0(data_file_prefix, hs_rev_tag, "_", hs_rev_digit, ".tsv.bz2")
+    exports_file_path <- file.path(path.package("ecxplor"), "data", oec_exports_filename)
 
-        hs_rev_tag <- substr(hs_rev_year, 3, 4)
-        hs_code_colname <- paste0("hs", hs_rev_tag)
-
-        for (hs_digit in hs_digits) {
-
-            hs_rev_digit_group <- list()
-
-            if (trade_tag == "export") {
-
-                data_file_prefix = "year_origin_hs"
-                col_classes <- c("integer", "factor", "factor", "numeric", "numeric", "numeric", "numeric")
-                col_names <- c("year", "origin", "product", "export_val", "import_val", "export_rca", "import_rca")
-
-            } else {
-
-                data_file_prefix = "year_origin_destination_hs"
-                col_classes <- c("integer", "factor", "factor", "character", "character", "character")
-                col_names <- c("year", "origin", "dest", "product", "export_val", "import_val")
-
-
-            }
-
-            data_file_path <- paste0(oec_data_path, data_file_prefix, hs_rev_tag, "_", hs_digit, ".tsv")
-
-            print(data_file_path)
-
-            data_panel <- tbl_df(read.csv(data_file_path,
-                                          header = TRUE,
-                                          sep = "\t",
-                                          colClasses = col_classes,
-                                          stringsAsFactors = FALSE,
-                                          na.strings = c("NULL")))
-
-            new_data_names <- gsub(hs_code_colname, "product", names(data_panel))
-            new_data_names <- gsub("origin", "country", new_data_names)
-            names(data_panel) <- new_data_names
-
-            hs_rev_group[[hs_digit]] <- data_panel
-
-        }
-
-        trade_panels[[hs_rev_year]] <- hs_rev_group
-
-
+    if (!(file.exists(exports_file_path))) {
+        downloadOECExports(hs_rev_year, hs_rev_digit)
     }
 
-    return(trade_panels)
+    exports_panel <- tbl_df(read.csv(exports_file_path,
+                                     header = TRUE,
+                                     sep = "\t",
+                                     colClasses = col_classes,
+                                     stringsAsFactors = FALSE,
+                                     na.strings = c("NULL")))
+
+    new_exports_names <- gsub(hs_code_colname, "product", names(exports_panel))
+    new_exports_names <- gsub("origin", "country", new_exports_names)
+    names(exports_panel) <- new_exports_names
+
+    return(exports_panel)
 
 }
 
 
-loadBACICountryInfoPanel <- function() {
+loadBACICountriesInfoPanel <- function() {
 
     col_classes <- c("character", "character", "character", "character")
     col_names <- c("name", "iso2", "country", "country_id")
 
+    countries_file_path <- file.path(path.package("ecxplor"), "data", "country_code_baci12.csv")
 
-    country_file_path <- paste0(baci_data_path, "country_code_baci12.csv")
-    country_info_panel <- tbl_df(read.csv(country_file_path,
-                                          header = TRUE,
-                                          sep = ",",
-                                          colClasses = col_classes,
-                                          stringsAsFactors = FALSE,
-                                          na.strings = c("NULL")))
+    if (!(file.exists(countries_file_path))) {
+        downloadBACICountriesInfo(hs_rev_year, hs_rev_digit)
+    }
 
-    country_info_panel[["iso2"]] <- tolower(country_info_panel[["iso2"]])
-    country_info_panel[["iso3"]] <- tolower(country_info_panel[["iso3"]])
+    countries_info_panel <- tbl_df(read.csv(countries_file_path,
+                                            header = TRUE,
+                                            sep = ",",
+                                            colClasses = col_classes,
+                                            stringsAsFactors = FALSE,
+                                            na.strings = c("NULL")))
 
-    names(country_info_panel) <- col_names
+    countries_info_panel[["iso2"]] <- tolower(countries_info_panel[["iso2"]])
+    countries_info_panel[["iso3"]] <- tolower(countries_info_panel[["iso3"]])
 
-    country_info_panel[["country_id"]] <- sprintf("%03d", as.integer(country_info_panel[["country_id"]]))
+    names(countries_info_panel) <- col_names
 
-    return(country_info_panel)
+    countries_info_panel[["country_id"]] <- sprintf("%03d", as.integer(countries_info_panel[["country_id"]]))
 
+    return(countries_info_panel)
 
 }
 
-## loadBACITradePanel
-##
-## Load BACI exports for the years 2012, 2013, and 2014.
-
-loadBACITradePanel <- function() {
+loadBACIExportsPanel <- function() {
 
     col_classes <- c("integer", "character", "character", "character",  "numeric", "numeric")
     col_names <- c("year", "product", "country_id", "destination_id", "export_val", "export_quantity")
@@ -197,7 +198,12 @@ loadBACITradePanel <- function() {
 
     for (year_tag in c("2012", "2013", "2014")) {
 
-        data_file_path <- paste0(baci_data_path, "baci12_", year_tag, ".csv")
+        data_file_name <- paste0("baci12_", year_tag)
+        data_file_path <- file.path(path.package("ecxplor"), "data", data_file_name)
+
+        if (!(file.exists(data_file_path))) {
+            downloadBACIExportsInfo(year_tag)
+        }
 
         if (is.null(raw_panel)) {
 
@@ -226,7 +232,7 @@ loadBACITradePanel <- function() {
 
     names(raw_panel) <- col_names
 
-    country_info_panel <- loadBACICountryInfoPanel()
+    country_info_panel <- loadBACICountriesInfoPanel()
     merged_panel <- tbl_df(merge(raw_panel, country_info_panel))
     unscaled_panel <- tbl_df(merged_panel[c("year", "country", "product", "export_val")])
     scaled_panel <- unscaled_panel %>% mutate(export_val = 1000 * export_val)
@@ -241,15 +247,26 @@ loadBACITradePanel <- function() {
 
 }
 
-## loadAlbertaTradePanel
-##
-## Load all available Alberta trade data.
+downloadAlbertaExports <- function() {
 
-loadAlbertaTradePanel <- function() {
+    goa_base_url <- "http://talentedco.in/Data/GOA"
 
-    data_file_path <- paste0(goa_data_path, "abExports.csv")
+    goa_countries_url <- paste0(goa_base_url, goa_countries_filename)
+    download.file(goa_countries_url, file.path(path.package("ecxplor"),
+                                                "data",
+                                                goa_countries_filename))
 
-    print(data_file_path)
+
+
+}
+
+loadAlbertaExportsPanel <- function() {
+
+    data_file_path <- file.path(path.package("ecxplor"), "data", "abExports.csv")
+
+    if (!(file.exists(data_file_path))) {
+        downloadAlbertaExports()
+    }
 
     col_classes <- c("integer", "character", "character", "numeric")
     col_names <- c("year", "country", "product", "export_val")
@@ -267,44 +284,22 @@ loadAlbertaTradePanel <- function() {
 
 }
 
-## loadExportsPanel
-##
-## Assemble the appropriate panel of exports based on the input arguments:
-##
-## * name = "oec" (Observatory) or "baci" (BACI)
-## * hs_rev_year = "1992" (oec), "1996" (baci, oec),
-##                      "2002" (oec), "2007" (oec)
-## * hs_digit = "4" or "6"
-## * input_year = the year for which complexity will be computed (ignored for
-##                BACI data!!!)
-## * ab_flag = TRUE (include AB data) or FALSE
-
 loadExportsPanel <- function(name, hs_rev_year, hs_digit, input_year, ab_flag) {
 
     ## The functions below (inefficiently) load all data of a certain type.
 
     if (name == "oec") {
-
-        raw_exports_panel <- loadObservatoryTradePanels(hs_rev_year,
-                                                        hs_digit,
-                                                        "export")[[1]][[1]]
-
+        raw_exports_panel <- loadOECExportsPanel(hs_rev_year, hs_digit)
     } else if (name == "baci") {
-
         ## Note that if we choose BACI data we ignore hs_rev_year here.
-        raw_exports_panel <- loadBACITradePanel()
-
+        raw_exports_panel <- loadBACIExportsPanel()
     }
 
     if (ab_flag == TRUE) {
-
         ab_panel <- loadAlbertaTradePanel()
         target_panel <- rbind(raw_exports_panel, ab_panel)
-
     } else {
-
         target_panel <- raw_exports_panel
-
     }
 
     ## Only here do we use input_year to determine min_year and apply the filter.

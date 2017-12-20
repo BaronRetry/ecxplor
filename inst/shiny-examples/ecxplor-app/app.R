@@ -13,13 +13,6 @@ library(GGally)
 
 library(shiny)
 
-hs_rev_year <- "1996"
-hs_rev_digit <- "6"
-input_year <- 2014
-phi_cutoff <- 0.55
-
-model_object <- runModel("baci", hs_rev_year, hs_rev_digit, input_year, TRUE)
-
 choices <- rownames(model_object[["proximity"]])
 choices_panel <- tbl_df(data.frame(product = choices,
                                    stringsAsFactors = FALSE))
@@ -29,7 +22,7 @@ product_info_panel <- model_object[["product_info"]]
 choices_info_panel <- tbl_df(merge(choices_panel, product_info_panel, all.x = TRUE))
 choices_to_display <- choices_info_panel[["product"]]
 names(choices_to_display) <- choices_info_panel[["name"]]
-unnamed_choices_to_display <- choices_to_display[is.na(names(choices_to_display))]
+unnamed_choices_to_display <- choices_to_display[is.na(names(choices_to_display))]3
 named_choices_to_display <- choices_to_display[!is.na(names(choices_to_display))]
 
 names(unnamed_choices_to_display) <- unnamed_choices_to_display
@@ -44,6 +37,23 @@ ui <- fluidPage(
     sidebarLayout(
 
         sidebarPanel(
+
+            selectInput(inputId = "data_tag",
+                        label = "Data source:",
+                        choices = c("OEC", "BACI"),
+                        multiple = FALSE),
+            selectInput(inputId = "hs_rev_year",
+                        label = "HS revision year:",
+                        choices = c("1992", "1996", "2002", "2007"),
+                        multiple = FALSE),
+            selectInput(inputId = "hs_rev_digit",
+                        label = "Product scheme digits:",
+                        choices = c("4", "6"),
+                        multiple = FALSE),
+            selectInput(inputId = "input_year",
+                        label = "Product scheme digits:",
+                        choices = c("4", "6"),
+                        multiple = FALSE),
 
             selectInput(inputId = "focus_product",
                         label = "Product focus:",
@@ -70,6 +80,17 @@ ui <- fluidPage(
 
 
 server <- function(input, output) {
+
+    output$model_object_label <- renderText( {
+
+        hs_rev_year <- "1996"
+        hs_rev_digit <- "6"
+        input_year <- 2014
+        phi_cutoff <- 0.55
+
+        model_object <- runModel("baci", hs_rev_year, hs_rev_digit, input_year, TRUE)
+
+    })
 
     output$product_space_plot <- renderForceNetwork(        {
             prepared_model <- prepareFocusedModelObject(model_object, input$focus_product, input$search_depth)

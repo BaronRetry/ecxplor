@@ -318,22 +318,12 @@ computeOutlookGain <- function(M, phi, pci, distance) {
 ## Note that for BACI data, the input_year is ignored when loading exports,
 ## but applied when determining product names from codes.
 
-runModel <- function(data_tag, product_code_rev, product_code_digit, year, ab_flag, updateProgress = NULL) {
-
-    updateMessage <- function(message_text) {
-
-        print(message_text)
-
-        if (is.function(updateProgress)) {
-            updateProgress(detail = message_text)
-        }
-
-    }
+runModel <- function(data_tag, product_code_rev, product_code_digit, year, ab_flag) {
 
     model <- list()
 
     message_text <- paste0("Loading dataset ... ", Sys.time())
-    updateMessage(message_text)
+    print(message_text)
 
     exports_panel <- loadExportsPanel(data_tag,
                                       product_code_rev,
@@ -342,22 +332,22 @@ runModel <- function(data_tag, product_code_rev, product_code_digit, year, ab_fl
                                       ab_flag)
 
     message_text <- paste0("Computing RCA ... ", Sys.time())
-    updateMessage(message_text)
+    print(message_text)
 
     rca_panel <- computeRCA(exports_panel)
 
     message_text <- paste0("Computing complexity ... ", Sys.time())
-    updateMessage(message_text)
+    print(message_text)
 
     complexity_panel <- computeComplexity(rca_panel)
 
     message_text <- paste0("Computing M matrix ... ", Sys.time())
-    updateMessage(message_text)
+    print(message_text)
 
     m <- computeM(complexity_panel)
 
     message_text <- paste0("Computing M-tilde ... ", Sys.time())
-    updateMessage(message_text)
+    print(message_text)
 
     diversity_0 <- computeDiversity0(m)
     ubiquity_0 <- computeUbiquity0(m)
@@ -365,27 +355,27 @@ runModel <- function(data_tag, product_code_rev, product_code_digit, year, ab_fl
     m_tilde_pci <- computeMTilde(m, diversity_0, ubiquity_0, "PCI")
 
     message_text <- paste0("Computing ECI/PCI ... ", Sys.time())
-    updateMessage(message_text)
+    print(message_text)
 
     eci <- computeRanks(m_tilde_eci)
     pci <- computeRanks(m_tilde_pci)
 
     message_text <- paste0("Computing distance measures ... ", Sys.time())
-    updateMessage(message_text)
+    print(message_text)
 
     phi <- computeProximity(m, ubiquity_0)
     distance <- computeDistance(m, phi)
 
     message_text <- paste0("Computing opportunity measures ... ", Sys.time())
-    updateMessage(message_text)
+    print(message_text)
 
     outlook <- computeOutlook(m, pci, distance)
     outlook_gain <- computeOutlookGain(m, phi, pci, distance)
 
     message_text <- paste0("All done! ", Sys.time())
-    updateMessage(message_text)
+    print(message_text)
 
-    model[["product_info"]] <- loadProductInfoPanels(hs_rev_year, hs_rev_digit)[[1]] %>% filter(product %in% rownames(phi))
+    model[["product_info"]] <- loadOECProductsInfoPanel(hs_rev_year, hs_rev_digit) %>% filter(product %in% rownames(phi))
     model[["country_info"]] <- loadBACICountryInfoPanel()
 
     model[["data_tag"]] <- data_tag
