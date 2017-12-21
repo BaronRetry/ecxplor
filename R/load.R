@@ -1,4 +1,24 @@
-downloadOECExports <- function(hs_rev_year, hs_rev_digit) {
+checkHSRevisionYearAndDigits <- function(hs_rev_year, hs_digits) {
+
+    if (!(hs_rev_year %in% c("1992", "1996", "2002", "2007"))) {
+        print0("error: no such HS revision year")
+        return(FALSE)
+    }
+
+    if (!(hs_rev_digit %in% c("4", "6"))) {
+        print0("error: no such HS coding length")
+        return(FALSE)
+    }
+
+    return(TRUE)
+
+}
+
+downloadOECExports <- function(hs_rev_year, hs_digits) {
+
+    if (!(checkHSRevisionYearAndDigits(hs_rev_year, hs_digits))) {
+        return(NULL)
+    }
 
     oec_base_url <- "https://atlas.media.mit.edu/"
 
@@ -6,7 +26,7 @@ downloadOECExports <- function(hs_rev_year, hs_rev_digit) {
 
     oec_data_filename <- paste0("year_origin_hs",
                                 hs_rev_code,
-                                "_", hs_rev_digit,
+                                "_", hs_digits,
                                 ".tsv.bz2")
 
     oec_data_url <- paste0(oec_base_url,
@@ -19,7 +39,11 @@ downloadOECExports <- function(hs_rev_year, hs_rev_digit) {
 
 }
 
-downloadOECProductsInfo <- function(hs_rev_year, hs_rev_digit) {
+downloadOECProductsInfo <- function(hs_rev_year, hs_digits) {
+
+    if (!(checkHSRevisionYearAndDigits(hs_rev_year, hs_digits))) {
+        return(NULL)
+    }
 
     oec_base_url <- "https://atlas.media.mit.edu"/
 
@@ -27,7 +51,7 @@ downloadOECProductsInfo <- function(hs_rev_year, hs_rev_digit) {
 
     oec_info_filename <- paste0("products_hs",
                                 hs_rev_code,
-                                "_", hs_rev_digit,
+                                "_", hs_digits,
                                 ".tsv.bz2")
 
     oec_info_url <- paste0(oec_base_url, "/static/db/raw/", oec_info_filename)
@@ -69,7 +93,7 @@ downloadBACIExports <- function(rev_year) {
 
 }
 
-downloadBACIProductsInfo <- function(hs_rev_year, hs_rev_digit) {
+downloadBACIProductsInfo <- function(hs_rev_year, hs_digits) {
 
 
 }
@@ -86,21 +110,25 @@ downloadBACICountriesInfo <- function() {
 
 }
 
-loadOECProductsInfoPanel <- function(hs_rev_year, hs_rev_digit) {
+loadOECProductsInfoPanel <- function(hs_rev_year, hs_digits) {
+
+    if (!(checkHSRevisionYearAndDigits(hs_rev_year, hs_digits))) {
+        return(NULL)
+    }
 
     hs_rev_tag <- substr(hs_rev_year, 3, 4)
     hs_code_colname <- paste0("hs", hs_rev_tag)
 
     oec_info_filename <- paste0("products_hs",
                                 hs_rev_code,
-                                "_", hs_rev_digit,
+                                "_", hs_digits,
                                 ".tsv.bz2")
 
 
     product_file_path <- file.path(path.package("ecxplor"), "data", oec_info_filename)
 
     if (!(file.exists(product_file_path))) {
-        downloadOECInfo(hs_rev_year, hs_rev_digit)
+        downloadOECInfo(hs_rev_year, hs_digits)
     }
 
     product_panel <- tbl_df(read.csv(product_file_path,
@@ -116,9 +144,9 @@ loadOECProductsInfoPanel <- function(hs_rev_year, hs_rev_digit) {
 
     digit_products <- c()
 
-    if (hs_rev_digit == "4") {
+    if (hs_digits == "4") {
         digit_products <- product_panel[["product"]][nchar(product_panel[["product"]]) == 4]
-    } else if (hs_rev_digit == "6") {
+    } else if (hs_digits == "6") {
         digit_products <- product_panel[["product"]][nchar(product_panel[["product"]]) == 6]
     }
 
@@ -128,7 +156,11 @@ loadOECProductsInfoPanel <- function(hs_rev_year, hs_rev_digit) {
 
 }
 
-loadOECExportsPanel <- function(hs_rev_year, hs_rev_digit) {
+loadOECExportsPanel <- function(hs_rev_year, hs_digits) {
+
+    if (!(checkHSRevisionYearAndDigits(hs_rev_year, hs_digits))) {
+        return(NULL)
+    }
 
     hs_rev_tag <- substr(hs_rev_year, 3, 4)
     hs_code_colname <- paste0("hs", hs_rev_tag)
@@ -137,11 +169,11 @@ loadOECExportsPanel <- function(hs_rev_year, hs_rev_digit) {
     col_classes <- c("integer", "factor", "factor", "numeric", "numeric", "numeric", "numeric")
     col_names <- c("year", "origin", "product", "export_val", "import_val", "export_rca", "import_rca")
 
-    oec_exports_filename <- paste0(data_file_prefix, hs_rev_tag, "_", hs_rev_digit, ".tsv.bz2")
+    oec_exports_filename <- paste0(data_file_prefix, hs_rev_tag, "_", hs_digits, ".tsv.bz2")
     exports_file_path <- file.path(path.package("ecxplor"), "data", oec_exports_filename)
 
     if (!(file.exists(exports_file_path))) {
-        downloadOECExports(hs_rev_year, hs_rev_digit)
+        downloadOECExports(hs_rev_year, hs_digits)
     }
 
     exports_panel <- tbl_df(read.csv(exports_file_path,
@@ -168,7 +200,7 @@ loadBACICountriesInfoPanel <- function() {
     countries_file_path <- file.path(path.package("ecxplor"), "data", "country_code_baci12.csv")
 
     if (!(file.exists(countries_file_path))) {
-        downloadBACICountriesInfo(hs_rev_year, hs_rev_digit)
+        downloadBACICountriesInfo()
     }
 
     countries_info_panel <- tbl_df(read.csv(countries_file_path,
@@ -255,8 +287,6 @@ downloadAlbertaExports <- function() {
     download.file(goa_countries_url, file.path(path.package("ecxplor"),
                                                 "data",
                                                 goa_countries_filename))
-
-
 
 }
 

@@ -395,6 +395,12 @@ runModel <- function(data_tag, product_code_rev, product_code_digit, year, ab_fl
     model[["opportunity"]] <- outlook
     model[["opportunity_gain"]] <- outlook_gain
 
+    model_descriptor <- paste(data_tag, product_code_rev, product_code_digit, year, sep = "_")
+
+    saveRDS(model, file = file.path(path.package("ecxplor"), "data",
+                                    model_descriptor, ".rds"))
+
+
     return(model)
 
 }
