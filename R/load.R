@@ -5,7 +5,7 @@ checkHSRevisionYearAndDigits <- function(hs_rev_year, hs_digits) {
         return(FALSE)
     }
 
-    if (!(hs_rev_digit %in% c("4", "6"))) {
+    if (!(hs_digits %in% c("4", "6"))) {
         print0("error: no such HS coding length")
         return(FALSE)
     }
@@ -45,16 +45,15 @@ downloadOECProductsInfo <- function(hs_rev_year, hs_digits) {
         return(NULL)
     }
 
-    oec_base_url <- "https://atlas.media.mit.edu"/
+    oec_base_url <- "https://atlas.media.mit.edu/"
 
     hs_rev_code <- substr(hs_rev_year, 3, 4)
 
-    oec_info_filename <- paste0("products_hs",
+    oec_info_filename <- paste0("products_hs_",
                                 hs_rev_code,
-                                "_", hs_digits,
                                 ".tsv.bz2")
 
-    oec_info_url <- paste0(oec_base_url, "/static/db/raw/", oec_info_filename)
+    oec_info_url <- paste0(oec_base_url, "static/db/raw/", oec_info_filename)
 
     download.file(oec_info_url, file.path(path.package("ecxplor"),
                                           "data",
@@ -78,7 +77,7 @@ downloadOECCountriesInfo <- function() {
 
 downloadBACIExports <- function(rev_year) {
 
-    baci_base_url <- "http://talentedco.in/Data/BACI"
+    baci_base_url <- "http://talentedco.in/Data/BACI/"
 
     baci_data_filename <- paste0("baci12_",
                                  rev_year,
@@ -100,7 +99,7 @@ downloadBACIProductsInfo <- function(hs_rev_year, hs_digits) {
 
 downloadBACICountriesInfo <- function() {
 
-    baci_base_url <- "http://talentedco.in/Data/BACI"
+    baci_base_url <- "http://talentedco.in/Data/BACI/"
 
     baci_countries_filename <- "country_code_baci12.csv"
     baci_countries_url <- paste0(baci_base_url, baci_countries_filename)
@@ -119,40 +118,62 @@ loadOECProductsInfoPanel <- function(hs_rev_year, hs_digits) {
     hs_rev_tag <- substr(hs_rev_year, 3, 4)
     hs_code_colname <- paste0("hs", hs_rev_tag)
 
-    oec_info_filename <- paste0("products_hs",
-                                hs_rev_code,
-                                "_", hs_digits,
+    products_file_name <- paste0("products_hs_",
+                                hs_rev_tag,
                                 ".tsv.bz2")
 
+    products_file_path <- file.path(path.package("ecxplor"), "data", products_file_name)
 
-    product_file_path <- file.path(path.package("ecxplor"), "data", oec_info_filename)
-
-    if (!(file.exists(product_file_path))) {
-        downloadOECInfo(hs_rev_year, hs_digits)
+    if (!(file.exists(products_file_path))) {
+        downloadOECProductsInfo(hs_rev_year, hs_digits)
     }
 
-    product_panel <- tbl_df(read.csv(product_file_path,
-                                     header = TRUE,
-                                     sep = "\t",
-                                     quote = "\"",
-                                     colClasses = c("character", "character", "character"),
-                                     stringsAsFactors = FALSE,
-                                     na.string = c("NULL")))
+    products_panel <- tbl_df(read.csv(products_file_path,
+                                      header = TRUE,
+                                      sep = "\t",
+                                      quote = "\"",
+                                      colClasses = c("character", "character", "character"),
+                                      stringsAsFactors = FALSE,
+                                      na.string = c("NULL")))
 
-    new_data_names <- gsub(hs_code_colname, "product", names(product_panel))
-    names(product_panel) <- new_data_names
+    new_data_names <- gsub(hs_code_colname, "product", names(products_panel))
+    names(products_panel) <- new_data_names
 
     digit_products <- c()
 
     if (hs_digits == "4") {
-        digit_products <- product_panel[["product"]][nchar(product_panel[["product"]]) == 4]
+        digit_products <- products_panel[["product"]][nchar(products_panel[["product"]]) == 4]
     } else if (hs_digits == "6") {
-        digit_products <- product_panel[["product"]][nchar(product_panel[["product"]]) == 6]
+        digit_products <- products_panel[["product"]][nchar(products_panel[["product"]]) == 6]
     }
 
-    nice_product_panel <- product_panel[product_panel["product"] == digit_products, ]
+    nice_products_panel <- products_panel[products_panel["product"] == digit_products, ]
 
-    return(nice_product_panel)
+    return(nice_products_panel)
+
+}
+
+loadOECCountriesInfoPanel <- function() {
+
+    countries_info_filename <- "country_names.tsv.bz2"
+
+    countries_file_path <- file.path(path.package("ecxplor"), "data", oec_info_filename)
+
+    if (!(file.exists(countries_file_path))) {
+        downloadOECCountriesInfo()
+    }
+
+    countries_panel <- tbl_df(read.csv(countries_file_path,
+                                       header = TRUE,
+                                       sep = "\t",
+                                       quote = "\"",
+                                       colClasses = c("character", "character", "character"),
+                                       stringsAsFactors = FALSE,
+                                       na.string = c("NULL")))
+
+    names(countries_panel) <- c("country_id", "country", "country_name")
+
+    return(countries_panel)
 
 }
 
@@ -230,11 +251,11 @@ loadBACIExportsPanel <- function() {
 
     for (year_tag in c("2012", "2013", "2014")) {
 
-        data_file_name <- paste0("baci12_", year_tag)
+        data_file_name <- paste0("baci12_", year_tag, ".csv")
         data_file_path <- file.path(path.package("ecxplor"), "data", data_file_name)
 
         if (!(file.exists(data_file_path))) {
-            downloadBACIExportsInfo(year_tag)
+            downloadBACIExports(year_tag)
         }
 
         if (is.null(raw_panel)) {
@@ -281,12 +302,13 @@ loadBACIExportsPanel <- function() {
 
 downloadAlbertaExports <- function() {
 
-    goa_base_url <- "http://talentedco.in/Data/GOA"
+    goa_base_url <- "http://talentedco.in/Data/GOA/"
+    goa_exports_filename <- "abExports.csv"
 
-    goa_countries_url <- paste0(goa_base_url, goa_countries_filename)
-    download.file(goa_countries_url, file.path(path.package("ecxplor"),
+    goa_exports_url <- paste0(goa_base_url, goa_exports_filename)
+    download.file(goa_exports_url, file.path(path.package("ecxplor"),
                                                 "data",
-                                                goa_countries_filename))
+                                                goa_exports_filename))
 
 }
 
@@ -326,7 +348,7 @@ loadExportsPanel <- function(name, hs_rev_year, hs_digit, input_year, ab_flag) {
     }
 
     if (ab_flag == TRUE) {
-        ab_panel <- loadAlbertaTradePanel()
+        ab_panel <- loadAlbertaExportsPanel()
         target_panel <- rbind(raw_exports_panel, ab_panel)
     } else {
         target_panel <- raw_exports_panel

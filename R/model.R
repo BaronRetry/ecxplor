@@ -375,15 +375,24 @@ runModel <- function(data_tag, product_code_rev, product_code_digit, year, ab_fl
     message_text <- paste0("All done! ", Sys.time())
     print(message_text)
 
-    model[["product_info"]] <- loadOECProductsInfoPanel(hs_rev_year, hs_rev_digit) %>% filter(product %in% rownames(phi))
-    model[["country_info"]] <- loadBACICountryInfoPanel()
-
     model[["data_tag"]] <- data_tag
+
+    if (data_tag == "oec") {
+        model[["product_info"]] <- loadOECProductsInfoPanel(product_code_rev, product_code_digit) %>%
+            filter(product %in% rownames(phi))
+        model[["country_info"]] <- loadOECCountriesInfoPanel()
+    } else if (data_tag == "baci") {
+        model[["product_info"]] <- loadOECProductsInfoPanel(product_code_rev, product_code_digit) %>%
+            filter(product %in% rownames(phi))
+        model[["country_info"]] <- loadBACICountriesInfoPanel()
+    } else {
+
+    }
+
     model[["product_code_rev"]] <- product_code_rev
     model[["product_code_digit"]] <- product_code_digit
     model[["input_year"]] <- year
     model[["ab_flag"]] <- ab_flag
-
     model[["exports"]] <- exports_panel
     model[["rca"]] <- rca_panel
     model[["complexity"]] <- complexity_panel
@@ -395,11 +404,17 @@ runModel <- function(data_tag, product_code_rev, product_code_digit, year, ab_fl
     model[["opportunity"]] <- outlook
     model[["opportunity_gain"]] <- outlook_gain
 
-    model_descriptor <- paste(data_tag, product_code_rev, product_code_digit, year, sep = "_")
+    model_descriptor <- ""
+
+    if (ab_flag == TRUE) {
+        model_descriptor <- paste(data_tag, product_code_rev, product_code_digit, year, "ab", sep = "_")
+    } else {
+        model_descriptor <- paste(data_tag, product_code_rev, product_code_digit, year, sep = "_")
+
+    }
 
     saveRDS(model, file = file.path(path.package("ecxplor"), "data",
-                                    model_descriptor, ".rds"))
-
+                                    paste0(model_descriptor, ".rds")))
 
     return(model)
 
