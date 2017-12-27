@@ -1,12 +1,12 @@
 checkHSRevisionYearAndDigits <- function(hs_rev_year, hs_digits) {
 
     if (!(hs_rev_year %in% c("1992", "1996", "2002", "2007"))) {
-        print0("error: no such HS revision year")
+        print("error: no such HS revision year")
         return(FALSE)
     }
 
     if (!(hs_digits %in% c("4", "6"))) {
-        print0("error: no such HS coding length")
+        print("error: no such HS coding length")
         return(FALSE)
     }
 
@@ -66,7 +66,7 @@ downloadOECCountriesInfo <- function() {
     oec_base_url <- "https://atlas.media.mit.edu/"
 
     oec_countries_filename <- "country_names.tsv.bz2"
-    oec_countries_url <- paste0(oec_base_url, oec_countries_filename)
+    oec_countries_url <- paste0(oec_base_url, "static/db/raw/", oec_countries_filename)
     download.file(oec_countries_url, file.path(path.package("ecxplor"),
                                                "data",
                                                oec_countries_filename))
@@ -157,7 +157,7 @@ loadOECCountriesInfoPanel <- function() {
 
     countries_info_filename <- "country_names.tsv.bz2"
 
-    countries_file_path <- file.path(path.package("ecxplor"), "data", oec_info_filename)
+    countries_file_path <- file.path(path.package("ecxplor"), "data", countries_info_filename)
 
     if (!(file.exists(countries_file_path))) {
         downloadOECCountriesInfo()
