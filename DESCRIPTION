@@ -1,9 +1,10 @@
 Package: ecxplor
-Title: What the Package Does (one line, title case)
+Title: Tool for exploring Economic Complexity
 Version: 0.0.0.9000
-Authors@R: person("First", "Last", email = "first.last@example.com", role = c("aut", "cre"))
-Description: What the package does (one paragraph).
+Authors@R: person("Robert Ryan", "Thompson", email = "r.ryan.thompson@protonmail.com", role = c("aut", "cre"))
+Description: Using data from the Observatory of Economic Complexity (atlas.media.mit.edu), produce model results and visualizations of the product space, complexity rankings, and more, per the work by Hidalgo and Hausmann.
 Depends: R (>= 3.4.2)
-License: What license is it under?
+License: MIT + file LICENSE
 Encoding: UTF-8
 LazyData: true
+Imports: dplyr
