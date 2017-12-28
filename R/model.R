@@ -1,9 +1,14 @@
-## computeRCA
-##
-## Takes the results of prepare_input_data and computes the the revealed
-## comparative advantage, or RCA, matrix. Each row represents a country and each
-## column represents a product, in the standard order. For more details about
-## the RCA, see Atlas p.25, Technical Box 2.2.
+#' Compute Revealed Comparative Advantage
+#'
+#' \code{computeRCA} takes the prepared export data and computes the revealed
+#' comparative advantage, or RCA, matrix. Each row represents a country and each
+#' column represents a product, in the standard order. For more details about
+#' the RCA, see Atlas p.25, Technical Box 2.2.
+#'
+#' @param exports_panel Data frame containing export data.
+#'
+#' @import dplyr
+#' @export
 
 computeRCA <- function(exports_panel) {
 
@@ -32,14 +37,19 @@ computeRCA <- function(exports_panel) {
 
 }
 
-## computeComplexity
-##
-## Takes country codes, product codes, and the RCA matrix. This function creates
-## the panel that will be translated into the matrix M. Each row represents a
-## country and each column represents a product, in the standard order. If a
-## country has RCA > 1 for some product, the entry for that country and product
-## in M will be 1; otherwise it is 0.  For more details about the matrix M, see
-## Atlas p.25, Technical Box 2.2.
+#' Compute Complexity Measure
+#'
+#' \code{computeComplexity} takes country codes, product codes, and the RCA
+#' matrix, and creates the panel that will be translated into the matrix M.
+#' Each row represents a country and each column represents a product, in the
+#' standard order. If a country has RCA > 1 for some product, the entry for
+#' that country and product in M will be 1; otherwise it is 0.  For more
+#' details about the matrix M, see Atlas p.25, Technical Box 2.2.
+#'
+#' @param rca_panel Data frame output from \code{computeRCA}.
+#'
+#' @import dplyr
+#' @export
 
 computeComplexity <- function(rca_panel) {
 
@@ -49,10 +59,16 @@ computeComplexity <- function(rca_panel) {
 
 }
 
-## computeM
-##
-## Takes the panel produced by computeComplexity and turns it into a matrix
-## with the correct row (country) and column (product) names (codes).
+#' Compute Complexity ("M") Matrix
+#'
+#' \code{computeM} takes the panel produced by computeComplexity and turns it
+#' into a matrix with the correct row (country) and column (product) names
+#' (codes). This matrix (designated in the Atlas using variable "M") is an
+#' important input for the rest of the model.
+#'
+#' @param complexity_panel Data frame output from \code{computeComplexity}.
+#'
+#' @export
 
 computeM <- function(complexity_panel) {
 
@@ -88,32 +104,48 @@ computeM <- function(complexity_panel) {
 
 }
 
-## computeDiversity0
-##
-## Takes the complexity (M) matrix and computes the initial values of
-## diversity, called k_{c,0} in the Atlas. For more details, see Atlas p.24,
-## Technical Box 2.1.
+#' Compute Diversity{0}
+#'
+#' \code{computeDiversity0} takes the complexity (M) matrix and computes the
+#' initial values of diversity, called k_{c,0} in the Atlas. For more details,
+#' see Atlas p.24, Technical Box 2.1.
+#'
+#' @param M_matrix Matrix output from \code{computeM}.
+#'
+#' @export
 
 computeDiversity0 <- function(M_matrix) {
     return(rowSums(M_matrix))
 }
 
-## computeUbiquity0
-##
-## Takes the complexity (M) matrix and computes the initial values of
-## ubiquity, called k_{p,0} in the Atlas. For more details, see Atlas p.24,
-## Technical Box 2.1.
+#' Compute Ubiquity{0}
+#'
+#' \code{computeUbiquity0} takes the complexity (M) matrix and computes the
+#' initial values of ubiquity, called k_{p,0} in the Atlas. For more details,
+#' see Atlas p.24, Technical Box 2.1.
+#'
+#' @param M_matrix Matrix output from \code{computeM}.
+#'
+#' @export
 
 computeUbiquity0 <- function(M_matrix) {
     return(colSums(M_matrix))
 }
 
-## computeMTilde
-##
-## Takes the complexity (M) matrix, and the initial values of diversity
-## and ubiquity, and computes M-tilde_{pp'} as it would be called in the Atlas.
-## This is the precursor to computing the product and economic complexity
-## indices (PCIs/ECIs). For more details, see Atlas p.24, Technical Box 2.1.
+#' Compute M-Tilde
+#'
+#' \code{computeMTilde} takes the complexity (M) matrix, and the initial values
+#' of diversity and ubiquity, and computes M-tilde_{pp'} as it would be called
+#' in the Atlas. This is the precursor to computing the product and economic
+#' complexity indices (PCIs/ECIs). For more details, see Atlas p.24, Technical
+#' Box 2.1.
+#' @param M Matrix output from \code{computeM}.
+#' @param diversity_0 Vector output from \code{computeDiversity0}.
+#' @param ubiquity_0 Vector output from \code{computeUbiquity0}.
+#' @param flag Switch between product and country computations (can be "PCI" for
+#' product complexity or "ECI" for economic, or country, complexity).
+#'
+#' @export
 
 computeMTilde <- function(M, diversity_0, ubiquity_0, flag) {
 
@@ -156,13 +188,17 @@ computeMTilde <- function(M, diversity_0, ubiquity_0, flag) {
 
 }
 
-## computeRanks
-##
-## Takes an M_tilde (either by country or by product) and computes the
-## appropriate ranking indicator (either ECI or PCI) by finding the
-## eigenvectors of M_tilde, taking the one associated with the second
-## eigenvalue, and normalizing its values. For more details, see Atlas
-## p.24, Technical Box 2.1.
+#' Compute Ranking Indicator (ECI/PCI)
+#'
+#' \code{computeRanks} takes an M_tilde (either by country or by product)
+#' and computes the appropriate ranking indicator (either ECI or PCI) by
+#' finding the eigenvectors of M_tilde, taking the one associated with the
+#' second eigenvalue, and normalizing its values. For more details, see Atlas
+#' p.24, Technical Box 2.1.
+#'
+#' @param M_tilde Matrix output of \code{computeMTilde}.
+#'
+#' @export
 
 computeRanks <- function(M_tilde) {
 
@@ -178,13 +214,19 @@ computeRanks <- function(M_tilde) {
 
 }
 
-## computeProximity
-##
-## Takes complexity (M) and the initial values of ubiquity and computes a
-## measure of the proximity (phi) between two products. Proximity is defined
-## as the conditional probability that a country exports one product given
-## that it already exports another. This measurement can be used to enable
-## visualizations of the product space. See Atlas p.52, Technical Box 5.1.
+#' Compute Proximity Measure
+#'
+#' \code{computeProximity} takes complexity (M) and the initial values of
+#' ubiquity and computes a measure of the proximity (phi) between two products.
+#' Proximity is defined as the conditional probability that a country exports
+#' one product given that it already exports another. This measurement can be
+#' used to enable visualizations of the product space. See Atlas p.52,
+#' Technical Box 5.1.
+#'
+#' @param M Matrix output of \code{computeM}.
+#' @param ubiquity_0 Vector output of \code{computeUbiquity0}.
+#'
+#' @export
 
 computeProximity <- function(M, ubiquity_0) {
 
@@ -205,14 +247,20 @@ computeProximity <- function(M, ubiquity_0) {
 
 }
 
-## computeDistance
-##
-## Takes complexity (M) and proximity (phi) and computes a distance measure
-## between countries and products. If a country exports most of the goods
-## related to a product, the distance between that country and that product
-## is short (close to 0). Vice versa, if a country exports few of the goods
-## related to a product, the distance between that country and that product
-## is long (close to 1). See Atlas p.54, Technical Box 5.4.
+#' Compute Distance Measure
+#'
+#' \code{computeDistance} takes complexity (M) and proximity (phi) and
+#' computes a distance measure between countries and products. If a country
+#' exports most of the goods related to a product, the distance between that
+#' country and that product is short (close to 0). Vice versa, if a country
+#' exports few of the goods related to a product, the distance between that
+#' country and that product is long (close to 1). See Atlas p.54, Technical
+#' Box 5.4.
+#'
+#' @param M Matrix output of \code{computeM}.
+#' @param phi Matrix output of \code{computeProximity}.
+#'
+#' @export
 
 computeDistance <- function(M, phi) {
 
@@ -229,12 +277,18 @@ computeDistance <- function(M, phi) {
 
 }
 
-## computeOutlook
-##
-## Takes complexity (M), the PCI, and distance and computes a weighted measure
-## of the total value of the products that a country is not exporting, weighted
-## by how close they are to what the country is currently exporting. See Atlas
-## p.54, Technical Box 5.4.
+#' Compute Outlook Measure
+#'
+#' \code{computeOutlook} takes complexity (M), the PCI, and distance and
+#' computes a weighted measure of the total value of the products that a
+#' country is not exporting, weighted by how close they are to what the country
+#' is currently exporting. See Atlas p.54, Technical Box 5.4.
+#'
+#' @param M M matrix output of \code{\link{computeM}}.
+#' @param pci PCI vector output of computeRanks(..., "pci").
+#' @param distance Distance matrix output of \code{\link{computeDistance}}.
+
+#' @export
 
 computeOutlook <- function(M, pci, distance) {
 
@@ -247,12 +301,19 @@ computeOutlook <- function(M, pci, distance) {
 
 }
 
-## computeOutlookGain
-##
-## Takes complexity (M), proximity (phi), the PCI, and distance, and computes
-## the contribution of any one product in opening up opportunities for
-## producing more advanced products in any given country. See Atlas p.54,
-## Technical Box 5.4.
+#' Compute Outlook Gain Measure
+#'
+#' \code{computeOutlookGain} takes complexity (M), proximity (phi), the PCI,
+#' and distance, and computes the contribution of any one product in opening up
+#' opportunities for producing more advanced products in any given country. See
+#' Atlas p.54, Technical Box 5.4.
+#'
+#' @param M M matrix output of \code{\link{computeM}}.
+#' @param phi Proximity matrix output of \code{\link{computeProximity}}.
+#' @param pci PCI vector output of computeRanks(..., "pci").
+#' @param distance Distance matrix output of \code{\link{computeDistance}}.
+#'
+#' @export
 
 computeOutlookGain <- function(M, phi, pci, distance) {
 
@@ -304,21 +365,27 @@ computeOutlookGain <- function(M, phi, pci, distance) {
 
 }
 
-## runModel
-##
-## Runs the entire model program and returns all the results wrapped in
-## a single object. Takes 5 arguments:
-##
-## * data_tag = "baci" or "oec"
-## * product_code_rev = "1992" (oec), "1996" (baci, oec),
-##                      "2002" (oec), "2007" (oec)
-## * product_code_digit = "4" or "6"
-## * ab_flag = TRUE (include AB data) or FALSE
-##
-## Note that for BACI data, the input_year is ignored when loading exports,
-## but applied when determining product names from codes.
+#' Run Standard OEC Model
+#'
+#' \code{runModel} runs the entire model program and returns all the results
+#' wrapped in a single object. It also saves a copy of the model run to the
+#' package data folder.
+#'
+#' Note that for BACI data, the input_year is ignored when loading exports,
+#' but applied when determining product names from codes.
+#'
+#' @param data_tag Dataset to use (can be "baci" or "oec").
+#' @param product_code_rev HS coding scheme revision year (can be "1992", "1996",
+#' "2002", or "2007").
+#' @param product_code_digit Number of digits in HS coding scheme (can be "4" or "6").
+#' @param input_year Year for which to run model (e.g. 2001, 2006).
+#' @param ab_flag = TRUE (include AB data) or FALSE
+#'
+#' @import dplyr
+#' @export
 
-runModel <- function(data_tag, product_code_rev, product_code_digit, year, ab_flag) {
+
+runModel <- function(data_tag, product_code_rev, product_code_digit, input_year, ab_flag) {
 
     model <- list()
 
@@ -328,7 +395,7 @@ runModel <- function(data_tag, product_code_rev, product_code_digit, year, ab_fl
     exports_panel <- loadExportsPanel(data_tag,
                                       product_code_rev,
                                       product_code_digit,
-                                      year,
+                                      input_year,
                                       ab_flag)
 
     message_text <- paste0("Computing RCA ... ", Sys.time())
@@ -391,7 +458,7 @@ runModel <- function(data_tag, product_code_rev, product_code_digit, year, ab_fl
 
     model[["product_code_rev"]] <- product_code_rev
     model[["product_code_digit"]] <- product_code_digit
-    model[["input_year"]] <- year
+    model[["input_year"]] <- input_year
     model[["ab_flag"]] <- ab_flag
     model[["exports"]] <- exports_panel
     model[["rca"]] <- rca_panel
@@ -407,9 +474,9 @@ runModel <- function(data_tag, product_code_rev, product_code_digit, year, ab_fl
     model_descriptor <- ""
 
     if (ab_flag == TRUE) {
-        model_descriptor <- paste(data_tag, product_code_rev, product_code_digit, year, "ab", sep = "_")
+        model_descriptor <- paste(data_tag, product_code_rev, product_code_digit, input_year, "ab", sep = "_")
     } else {
-        model_descriptor <- paste(data_tag, product_code_rev, product_code_digit, year, sep = "_")
+        model_descriptor <- paste(data_tag, product_code_rev, product_code_digit, input_year, sep = "_")
 
     }
 
@@ -417,5 +484,47 @@ runModel <- function(data_tag, product_code_rev, product_code_digit, year, ab_fl
                                     paste0(model_descriptor, ".rds")))
 
     return(model)
+
+}
+
+#' Run Model For All OEC Data
+#'
+#' \code{runModelForAllOECData} runs the model over all the Atlas data that
+#' ecxplor knows about. (This takes a really long time!!!)
+
+runModelForAllOECData <- function() {
+
+    for (hs_rev in c("1992")) {
+        for (hs_digits in c("4", "6")) {
+            for (input_year in seq(1998, 2000)) {
+                runModel("oec", hs_rev, hs_digits, input_year, FALSE)
+            }
+        }
+    }
+
+    for (hs_rev in c("1992", "1996")) {
+        for (hs_digits in c("4", "6")) {
+            for (input_year in seq(2001, 2014)) {
+                runModel("oec", hs_rev, hs_digits, input_year, FALSE)
+            }
+        }
+    }
+
+
+    for (hs_rev in c("2002")) {
+        for (hs_digits in c("4", "6")) {
+            for (input_year in seq(2006, 2014)) {
+                runModel("oec", hs_rev, hs_digits, input_year, FALSE)
+            }
+        }
+    }
+
+    for (hs_rev in c("2007")) {
+        for (hs_digits in c("4", "6")) {
+            for (input_year in seq(2011, 2014)) {
+                runModel("oec", hs_rev, hs_digits, input_year, FALSE)
+            }
+        }
+    }
 
 }

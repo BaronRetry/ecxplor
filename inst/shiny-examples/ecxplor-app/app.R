@@ -1,17 +1,12 @@
-rm(list = ls())
-
-source("../../../R/load.R")
-source("../../../R/model.R")
-source("../../../R/output.R")
-source("../../../R/viz.R")
-
+library(ggplot2)
 library(dplyr)
 library(network)
 library(networkD3)
 library(sna)
 library(GGally)
-
 library(shiny)
+
+library(ecxplor)
 
 choices <- rownames(model_object[["proximity"]])
 choices_panel <- tbl_df(data.frame(product = choices,

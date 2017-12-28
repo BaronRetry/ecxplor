@@ -1,3 +1,15 @@
+#' Check HS Product Coding Request
+#'
+#' \code{checkHSRevisionYearAndDigits} is a convenience function to make sure
+#' that the user requests a valid coding scheme for OEC data.
+#'
+#' @param hs_rev_year HS coding scheme revision year (can be "1992", "1996",
+#' "2002", or "2007").
+#' @param hs_digits Number of digits in HS coding scheme (can be "4" or "6").
+#' @return TRUE if requested HS coding scheme is valid, FALSE otherwise.
+#'
+#' @export
+
 checkHSRevisionYearAndDigits <- function(hs_rev_year, hs_digits) {
 
     if (!(hs_rev_year %in% c("1992", "1996", "2002", "2007"))) {
@@ -13,6 +25,15 @@ checkHSRevisionYearAndDigits <- function(hs_rev_year, hs_digits) {
     return(TRUE)
 
 }
+
+#' Download Export Data From OEC
+#'
+#' \code{downloadOECExports} downloads an appropriate exports dataset
+#' from the Observatory of Economic Complexity.
+#'
+#' @inheritParams checkHSRevisionYearAndDigits
+#'
+#' @export
 
 downloadOECExports <- function(hs_rev_year, hs_digits) {
 
@@ -39,6 +60,15 @@ downloadOECExports <- function(hs_rev_year, hs_digits) {
 
 }
 
+#' Download Product Coding Scheme From OEC
+#'
+#' \code{downloadOECProductsInfo} downloads an appropriate HS product coding
+#' scheme from the Observatory of Economic Complexity.
+#' @inheritParams checkHSRevisionYearAndDigits
+#'
+#' @export
+
+
 downloadOECProductsInfo <- function(hs_rev_year, hs_digits) {
 
     if (!(checkHSRevisionYearAndDigits(hs_rev_year, hs_digits))) {
@@ -61,6 +91,13 @@ downloadOECProductsInfo <- function(hs_rev_year, hs_digits) {
 
 }
 
+#' Download Country Coding Scheme From OEC
+#'
+#' \code{downloadOECCountriesInfo} downloads the country coding scheme from the
+#' Observatory of Economic Complexity.
+#'
+#' @export
+
 downloadOECCountriesInfo <- function() {
 
     oec_base_url <- "https://atlas.media.mit.edu/"
@@ -73,7 +110,7 @@ downloadOECCountriesInfo <- function() {
 
 }
 
-
+#' @export
 
 downloadBACIExports <- function(rev_year) {
 
@@ -97,6 +134,8 @@ downloadBACIProductsInfo <- function(hs_rev_year, hs_digits) {
 
 }
 
+#' @export
+
 downloadBACICountriesInfo <- function() {
 
     baci_base_url <- "http://talentedco.in/Data/BACI/"
@@ -108,6 +147,16 @@ downloadBACICountriesInfo <- function() {
                                                 baci_countries_filename))
 
 }
+
+#' Load Product Coding Scheme From OEC
+#'
+#'
+#' \code{loadOECProductsInfoPanel} downloads the appropriate HS product coding
+#' scheme from the Observatory of Economic Complexity, if it isn't present in
+#' the /data folder, and returns the result as a data frame.
+#' @inheritParams checkHSRevisionYearAndDigits
+#'
+#' @export
 
 loadOECProductsInfoPanel <- function(hs_rev_year, hs_digits) {
 
@@ -153,6 +202,14 @@ loadOECProductsInfoPanel <- function(hs_rev_year, hs_digits) {
 
 }
 
+#' Load Country Coding Scheme From OEC
+#'
+#' \code{loadOECCountriesInfo} downloads the country coding scheme from the
+#' Observatory of Economic Complexity, if it isn't present in the /data folder,
+#' and returns the result as a data frame.
+#'
+#' @export
+
 loadOECCountriesInfoPanel <- function() {
 
     countries_info_filename <- "country_names.tsv.bz2"
@@ -176,6 +233,13 @@ loadOECCountriesInfoPanel <- function() {
     return(countries_panel)
 
 }
+
+#' Load Export Data From OEC
+#'
+#' \code{loadOECExports} downloads an appropriate exports dataset from the
+#' Observatory of Economic Complexity, if it isn't present in the /data folder,
+#' and returns the result as a data frame.
+#' @inheritParams checkHSRevisionYearAndDigits
 
 loadOECExportsPanel <- function(hs_rev_year, hs_digits) {
 
@@ -212,6 +276,7 @@ loadOECExportsPanel <- function(hs_rev_year, hs_digits) {
 
 }
 
+#' @export
 
 loadBACICountriesInfoPanel <- function() {
 
@@ -241,6 +306,8 @@ loadBACICountriesInfoPanel <- function() {
     return(countries_info_panel)
 
 }
+
+#' @export
 
 loadBACIExportsPanel <- function() {
 
@@ -300,6 +367,8 @@ loadBACIExportsPanel <- function() {
 
 }
 
+#' @export
+
 downloadAlbertaExports <- function() {
 
     goa_base_url <- "http://talentedco.in/Data/GOA/"
@@ -311,6 +380,8 @@ downloadAlbertaExports <- function() {
                                                 goa_exports_filename))
 
 }
+
+#' @export
 
 loadAlbertaExportsPanel <- function() {
 
@@ -336,12 +407,26 @@ loadAlbertaExportsPanel <- function() {
 
 }
 
-loadExportsPanel <- function(name, hs_rev_year, hs_digit, input_year, ab_flag) {
+#' Load Export Data
+#'
+#' \code{loadExports Panel} downloads an appropriate exports dataset, if it
+#' isn't present in the /data folder, and returns the result as a data frame.
+#'
+#' @param name Name of data source (can be "oec" or "baci").
+#' @param hs_rev_year HS coding scheme revision year (can be "1992", "1996",
+#' "2002", or "2007").
+#' @param hs_digits Number of digits in HS coding scheme (can be "4" or "6").
+#' @param input_year Year for which to run model (e.g. 2001, 2006).
+#' @param ab_flag Set to TRUE to include data for Alberta, or FALSE to exclude.
+#'
+#' @export
+
+loadExportsPanel <- function(name, hs_rev_year, hs_digits, input_year, ab_flag) {
 
     ## The functions below (inefficiently) load all data of a certain type.
 
     if (name == "oec") {
-        raw_exports_panel <- loadOECExportsPanel(hs_rev_year, hs_digit)
+        raw_exports_panel <- loadOECExportsPanel(hs_rev_year, hs_digits)
     } else if (name == "baci") {
         ## Note that if we choose BACI data we ignore hs_rev_year here.
         raw_exports_panel <- loadBACIExportsPanel()
