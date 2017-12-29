@@ -51,7 +51,7 @@ downloadOECExports <- function(hs_rev_year, hs_digits) {
                            oec_data_filename)
 
     download.file(url = oec_data_url, destfile = file.path(path.package("ecxplor"),
-                                                           "data",
+                                                           "extdata",
                                                            oec_data_filename))
 
 }
@@ -82,7 +82,7 @@ downloadOECProductsInfo <- function(hs_rev_year, hs_digits) {
     oec_info_url <- paste0(oec_base_url, "static/db/raw/", oec_info_filename)
 
     download.file(oec_info_url, file.path(path.package("ecxplor"),
-                                          "data",
+                                          "extdata",
                                           oec_info_filename))
 
 }
@@ -101,7 +101,7 @@ downloadOECCountriesInfo <- function() {
     oec_countries_filename <- "country_names.tsv.bz2"
     oec_countries_url <- paste0(oec_base_url, "static/db/raw/", oec_countries_filename)
     download.file(oec_countries_url, file.path(path.package("ecxplor"),
-                                               "data",
+                                               "extdata",
                                                oec_countries_filename))
 
 }
@@ -127,7 +127,7 @@ downloadBACIExports <- function(input_year) {
                             baci_data_filename)
 
     download.file(url = baci_data_url, destfile = file.path(path.package("ecxplor"),
-                                                            "data",
+                                                            "extdata",
                                                             baci_data_filename))
 
 }
@@ -146,7 +146,7 @@ downloadBACICountriesInfo <- function() {
     baci_countries_filename <- "country_code_baci12.csv"
     baci_countries_url <- paste0(baci_base_url, baci_countries_filename)
     download.file(baci_countries_url, file.path(path.package("ecxplor"),
-                                                "data",
+                                                "extdata",
                                                 baci_countries_filename))
 
 }
@@ -174,7 +174,7 @@ loadOECProductsInfoPanel <- function(hs_rev_year, hs_digits) {
                                 hs_rev_tag,
                                 ".tsv.bz2")
 
-    products_file_path <- file.path(path.package("ecxplor"), "data", products_file_name)
+    products_file_path <- file.path(path.package("ecxplor"), "extdata", products_file_name)
 
     if (!(file.exists(products_file_path))) {
         downloadOECProductsInfo(hs_rev_year, hs_digits)
@@ -217,7 +217,7 @@ loadOECCountriesInfoPanel <- function() {
 
     countries_info_filename <- "country_names.tsv.bz2"
 
-    countries_file_path <- file.path(path.package("ecxplor"), "data", countries_info_filename)
+    countries_file_path <- file.path(path.package("ecxplor"), "extdata", countries_info_filename)
 
     if (!(file.exists(countries_file_path))) {
         downloadOECCountriesInfo()
@@ -258,7 +258,7 @@ loadOECExportsPanel <- function(hs_rev_year, hs_digits) {
     col_names <- c("year", "origin", "product", "export_val", "import_val", "export_rca", "import_rca")
 
     oec_exports_filename <- paste0(data_file_prefix, hs_rev_tag, "_", hs_digits, ".tsv.bz2")
-    exports_file_path <- file.path(path.package("ecxplor"), "data", oec_exports_filename)
+    exports_file_path <- file.path(path.package("ecxplor"), "extdata", oec_exports_filename)
 
     if (!(file.exists(exports_file_path))) {
         downloadOECExports(hs_rev_year, hs_digits)
@@ -292,7 +292,7 @@ loadBACICountriesInfoPanel <- function() {
     col_classes <- c("character", "character", "character", "character")
     col_names <- c("name", "iso2", "country", "country_id")
 
-    countries_file_path <- file.path(path.package("ecxplor"), "data", "country_code_baci12.csv")
+    countries_file_path <- file.path(path.package("ecxplor"), "extdata", "country_code_baci12.csv")
 
     if (!(file.exists(countries_file_path))) {
         downloadBACICountriesInfo()
@@ -334,7 +334,7 @@ loadBACIExportsPanel <- function() {
     for (year_tag in c("2012", "2013", "2014")) {
 
         data_file_name <- paste0("baci12_", year_tag, ".csv")
-        data_file_path <- file.path(path.package("ecxplor"), "data", data_file_name)
+        data_file_path <- file.path(path.package("ecxplor"), "extdata", data_file_name)
 
         if (!(file.exists(data_file_path))) {
             downloadBACIExports(year_tag)
@@ -396,7 +396,7 @@ downloadAlbertaExports <- function() {
 
     goa_exports_url <- paste0(goa_base_url, goa_exports_filename)
     download.file(goa_exports_url, file.path(path.package("ecxplor"),
-                                                "data",
+                                                "extdata",
                                                 goa_exports_filename))
 
 }
@@ -411,7 +411,7 @@ downloadAlbertaExports <- function() {
 
 loadAlbertaExportsPanel <- function() {
 
-    data_file_path <- file.path(path.package("ecxplor"), "data", "abExports.csv")
+    data_file_path <- file.path(path.package("ecxplor"), "extdata", "abExports.csv")
 
     if (!(file.exists(data_file_path))) {
         downloadAlbertaExports()

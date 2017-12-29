@@ -387,7 +387,7 @@ computeOutlookGain <- function(M, phi, pci, distance) {
 
 runModel <- function(data_tag, product_code_rev, product_code_digit, input_year, ab_flag) {
 
-    model <- list()
+    model_obj <- list()
 
     message_text <- paste0("Loading dataset ... ", Sys.time())
     print(message_text)
@@ -442,34 +442,34 @@ runModel <- function(data_tag, product_code_rev, product_code_digit, input_year,
     message_text <- paste0("All done! ", Sys.time())
     print(message_text)
 
-    model[["data_tag"]] <- data_tag
+    model_obj[["data_tag"]] <- data_tag
 
     if (data_tag == "oec") {
-        model[["product_info"]] <- loadOECProductsInfoPanel(product_code_rev, product_code_digit) %>%
+        model_obj[["product_info"]] <- loadOECProductsInfoPanel(product_code_rev, product_code_digit) %>%
             filter(product %in% rownames(phi))
-        model[["country_info"]] <- loadOECCountriesInfoPanel()
+        model_obj[["country_info"]] <- loadOECCountriesInfoPanel()
     } else if (data_tag == "baci") {
-        model[["product_info"]] <- loadOECProductsInfoPanel(product_code_rev, product_code_digit) %>%
+        model_obj[["product_info"]] <- loadOECProductsInfoPanel(product_code_rev, product_code_digit) %>%
             filter(product %in% rownames(phi))
-        model[["country_info"]] <- loadBACICountriesInfoPanel()
+        model_obj[["country_info"]] <- loadBACICountriesInfoPanel()
     } else {
 
     }
 
-    model[["product_code_rev"]] <- product_code_rev
-    model[["product_code_digit"]] <- product_code_digit
-    model[["input_year"]] <- input_year
-    model[["ab_flag"]] <- ab_flag
-    model[["exports"]] <- exports_panel
-    model[["rca"]] <- rca_panel
-    model[["complexity"]] <- complexity_panel
-    model[["m"]] <- m
-    model[["eci"]] <- eci
-    model[["pci"]] <- pci
-    model[["proximity"]] <- phi
-    model[["distance"]] <- distance
-    model[["opportunity"]] <- outlook
-    model[["opportunity_gain"]] <- outlook_gain
+    model_obj[["product_code_rev"]] <- product_code_rev
+    model_obj[["product_code_digit"]] <- product_code_digit
+    model_obj[["input_year"]] <- input_year
+    model_obj[["ab_flag"]] <- ab_flag
+    model_obj[["exports"]] <- exports_panel
+    model_obj[["rca"]] <- rca_panel
+    model_obj[["complexity"]] <- complexity_panel
+    model_obj[["m"]] <- m
+    model_obj[["eci"]] <- eci
+    model_obj[["pci"]] <- pci
+    model_obj[["proximity"]] <- phi
+    model_obj[["distance"]] <- distance
+    model_obj[["opportunity"]] <- outlook
+    model_obj[["opportunity_gain"]] <- outlook_gain
 
     model_descriptor <- ""
 
@@ -480,10 +480,10 @@ runModel <- function(data_tag, product_code_rev, product_code_digit, input_year,
 
     }
 
-    saveRDS(model, file = file.path(path.package("ecxplor"), "data",
-                                    paste0(model_descriptor, ".rds")))
+    save(model_obj, file = file.path(path.package("ecxplor"), "data",
+                                    paste0(model_descriptor, ".RData")))
 
-    return(model)
+    return(model_obj)
 
 }
 
@@ -491,6 +491,8 @@ runModel <- function(data_tag, product_code_rev, product_code_digit, input_year,
 #'
 #' \code{runModelForAllOECData} runs the model over all the Atlas data that
 #' ecxplor knows about. (This takes a really long time!!!)
+#'
+#' @export
 
 runModelForAllOECData <- function() {
 
