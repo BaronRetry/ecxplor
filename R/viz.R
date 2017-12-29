@@ -1,3 +1,14 @@
+#' Make Network For Product Space From Economic Complexity Model
+#'
+#' \code{makeNetworkFromModel} uses the model input and a cutoff value of
+#' proximity (phi) to create a version of the product space suitable for
+#' network visualization.
+#'
+#' @param model_object Model output of \code{\link{runModel}}.
+#' @param phi_cutoff_value Double cutoff value for proximity.
+#'
+#' @export
+
 makeNetworkFromModel <- function(model_object, phi_cutoff_value) {
 
     proximity_matrix <- model_object[["proximity"]]
@@ -48,6 +59,19 @@ makeNetworkFromModel <- function(model_object, phi_cutoff_value) {
     return(result)
 
 }
+
+#' Make Focused Network For Product Space From Economic Complexity Model
+#'
+#' \code{makeFocusedNetworkFromModel} uses the model input, a target product
+#' code, and a search depth limit  to create a version of the model focussed
+#' on a single product, suitable for network visualization.
+#'
+#' @param model_object Model output of \code{\link{runModel}}.
+#' @param focus_product_code String determining which product code to focus on.
+#' @param n_search_depth Integer number of levels "away" from the focus product
+#' to display.
+#'
+#' @export
 
 makeFocusedNetworkFromModel <- function(model_object, focus_product_code, n_search_depth) {
 
@@ -126,9 +150,24 @@ makeFocusedNetworkFromModel <- function(model_object, focus_product_code, n_sear
 
 }
 
-prepareFocusedModelObject <- function(model_object, product_code, depth_cutoff) {
 
-    model_network_result <- makeFocusedNetworkFromModel(model_object, product_code, depth_cutoff)
+#' Make Focused Model Object For Product Space From Economic Complexity Model
+#'
+#' \code{prepareFocusedModelObject} uses the model input, a cutoff value of
+#' proximity (phi), and a search depthj limit  to create a version of the
+#' product space focussed on a single product, suitable for network
+#' visualization.
+#'
+#' @param model_object Model output of \code{\link{runModel}}.
+#' @param focus_product_code String determining which product code to focus on.
+#' @param n_search_depth Integer number of levels "away" from the focus product
+#' to display.
+#'
+#' @export
+
+prepareFocusedModelObject <- function(model_object, focus_product_code, n_search_depth) {
+
+    model_network_result <- makeFocusedNetworkFromModel(model_object, focus_product_code, n_search_depth)
 
 
     nodes_panel <- model_network_result[["nodes"]]
@@ -157,17 +196,3 @@ prepareFocusedModelObject <- function(model_object, product_code, depth_cutoff) 
     return(result)
 
 }
-
-
-
-## focusModelObject <- function(prepared_model, product_code) {
-
-##     nodes_d3 <- prepared_model[["d3_nodes"]]
-##     edges_d3 <- prepared_model[["d3_edges"]]
-
-##     nodes_panel <- tbl_df(nodes_d3)
-##     edges_panel <- tbl_df(edges_d3)
-
-##     focused_nodes_panel <- nodes_panel %<%
-
-## }

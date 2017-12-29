@@ -1,3 +1,11 @@
+#' Generate Basic Output
+#'
+#' \code{generateBasicOutput} uses the model input to create some standardized
+#' csv output. Output is dumped into the current working directory for now.
+#'
+#' @param model Output from \code{\link{runModel}}.
+#' @export
+
 generateBasicOutput <- function(model) {
 
     country_info_panel <- list()
