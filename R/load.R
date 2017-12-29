@@ -7,8 +7,6 @@
 #' "2002", or "2007").
 #' @param hs_digits Number of digits in HS coding scheme (can be "4" or "6").
 #' @return TRUE if requested HS coding scheme is valid, FALSE otherwise.
-#'
-#' @export
 
 checkHSRevisionYearAndDigits <- function(hs_rev_year, hs_digits) {
 
@@ -32,8 +30,6 @@ checkHSRevisionYearAndDigits <- function(hs_rev_year, hs_digits) {
 #' from the Observatory of Economic Complexity.
 #'
 #' @inheritParams checkHSRevisionYearAndDigits
-#'
-#' @export
 
 downloadOECExports <- function(hs_rev_year, hs_digits) {
 
@@ -110,14 +106,21 @@ downloadOECCountriesInfo <- function() {
 
 }
 
+#' Download Export Data From OEC
+#'
+#' \code{downloadOECExports} downloads an appropriate exports dataset
+#' from the Observatory of Economic Complexity.
+#'
+#' @param input_year integer year to download (can be 2012, 2013, or 2014)
+#'
 #' @export
 
-downloadBACIExports <- function(rev_year) {
+downloadBACIExports <- function(input_year) {
 
     baci_base_url <- "http://talentedco.in/Data/BACI/"
 
     baci_data_filename <- paste0("baci12_",
-                                 rev_year,
+                                 input_year,
                                  ".csv")
 
     baci_data_url <- paste0(baci_base_url,
@@ -129,11 +132,11 @@ downloadBACIExports <- function(rev_year) {
 
 }
 
-downloadBACIProductsInfo <- function(hs_rev_year, hs_digits) {
-
-
-}
-
+#' Download Country Coding Scheme From BACI
+#'
+#' \code{downloadOECCountriesInfo} downloads the country coding scheme from the
+#' BACI project.
+#'
 #' @export
 
 downloadBACICountriesInfo <- function() {
@@ -204,7 +207,7 @@ loadOECProductsInfoPanel <- function(hs_rev_year, hs_digits) {
 
 #' Load Country Coding Scheme From OEC
 #'
-#' \code{loadOECCountriesInfo} downloads the country coding scheme from the
+#' \code{loadOECCountriesInfoPanel} downloads the country coding scheme from the
 #' Observatory of Economic Complexity, if it isn't present in the /data folder,
 #' and returns the result as a data frame.
 #'
@@ -236,7 +239,7 @@ loadOECCountriesInfoPanel <- function() {
 
 #' Load Export Data From OEC
 #'
-#' \code{loadOECExports} downloads an appropriate exports dataset from the
+#' \code{loadOECExportsPanel} downloads an appropriate exports dataset from the
 #' Observatory of Economic Complexity, if it isn't present in the /data folder,
 #' and returns the result as a data frame.
 #' @inheritParams checkHSRevisionYearAndDigits
@@ -276,6 +279,12 @@ loadOECExportsPanel <- function(hs_rev_year, hs_digits) {
 
 }
 
+#' Load Country Coding Scheme From BACI
+#'
+#' \code{loadBACICountriesInfoPanel} downloads the country coding scheme from the
+#' BACI project, if it isn't present in the /data folder, and returns the
+#' result as a data frame.
+#'
 #' @export
 
 loadBACICountriesInfoPanel <- function() {
@@ -307,6 +316,12 @@ loadBACICountriesInfoPanel <- function() {
 
 }
 
+#' Load Export Data From BACI
+#'
+#' \code{loadBACIExportsPanel} downloads a 2012-2014 exports dataset from the
+#' BACI project, if it isn't present in the /data folder, and returns the
+#' result as a data frame.
+#'
 #' @export
 
 loadBACIExportsPanel <- function() {
@@ -367,6 +382,11 @@ loadBACIExportsPanel <- function() {
 
 }
 
+#' Download Export Data From Alberta World Trade Atlas
+#'
+#' \code{downloadAlbertaExports} downloads an appropriate exports dataset from
+#' the Alberta World Trade Atlas.
+#'
 #' @export
 
 downloadAlbertaExports <- function() {
@@ -381,6 +401,12 @@ downloadAlbertaExports <- function() {
 
 }
 
+#' Load Export Data From Alberta World Trade Atlas
+#'
+#' \code{loadAlbertaExportsPanel} downloads an Alberta exports dataset from the
+#' World Trade Atlas, if it isn't present in the /data folder, and returns the
+#' result as a data frame.
+#'
 #' @export
 
 loadAlbertaExportsPanel <- function() {

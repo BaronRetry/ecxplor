@@ -5,9 +5,7 @@ generateBasicOutput <- function(model) {
     data_tag <- model[["data_tag"]]
 
     if (data_tag == "baci") {
-
-        country_info_panel <- loadBACICountryInfoPanel()
-
+        country_info_panel <- loadBACICountriesInfoPanel()
     }
 
     product_code_rev <- model[["product_code_rev"]]
@@ -15,7 +13,7 @@ generateBasicOutput <- function(model) {
     input_year <- model[["input_year"]]
 
 
-    product_info_panel <- loadProductInfoPanels(product_code_rev, product_code_digit)[[1]]
+    product_info_panel <- loadOECProductsInfoPanel(product_code_rev, product_code_digit)
 
     exports_panel <- model[["exports"]]
 
@@ -115,7 +113,7 @@ generateBasicOutput <- function(model) {
                                    pci = pci,
                                    stringsAsFactors = FALSE))
 
-    ab_exports_panel <- loadAlbertaTradePanel()
+    ab_exports_panel <- loadAlbertaExportsPanel()
 
     ab_exports_lag0_panel <- ab_exports_panel %>% filter(year == lag0_year) %>%
         rename_(.dots = setNames(list("export_val"), paste0("ab_export_val_", lag0_year))) %>%
