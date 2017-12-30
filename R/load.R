@@ -24,6 +24,39 @@ checkHSRevisionYearAndDigits <- function(hs_rev_year, hs_digits) {
 
 }
 
+#' Check HS Product Coding Request For Input Year
+#'
+#' \code{checkHSRevisionYearAndDigitsForInputYear} is a convenience function
+#' to make sure that the user requests a valid coding scheme and input year for
+#' OEC data.
+#'
+#' @param hs_rev_year HS coding scheme revision year (can be "1992", "1996",
+#' "2002", or "2007").
+#' @param hs_digits Number of digits in HS coding scheme (can be "4" or "6").
+#' @param input_year Requested integer input year.
+#' @return TRUE if requested HS coding scheme is valid, FALSE otherwise.
+
+checkHSRevisionYearAndDigitsForInputYear <- function(hs_rev_year, hs_digits, input_year) {
+
+    first_check <- checkHSRevisionYearAndDigits(hs_rev_year, hs_digits)
+
+    if (first_check == FALSE) {
+        return(FALSE)
+    }
+
+    valid_input_years <- switch(hs_rev_year,
+                                "1992" = seq(1998, 2000),
+                                "1996" = seq(2001, 2014),
+                                "2002" = seq(2006, 2014),
+                                "2007" = seq(2011, 2014))
+
+    if (input_year %in% valid_input_years) {
+        return(TRUE)
+    } else {
+        return(FALSE)
+    }
+}
+
 #' Download Export Data From OEC
 #'
 #' \code{downloadOECExports} downloads an appropriate exports dataset
@@ -452,7 +485,17 @@ loadExportsPanel <- function(name, hs_rev_year, hs_digits, input_year, ab_flag) 
     ## The functions below (inefficiently) load all data of a certain type.
 
     if (name == "oec") {
+
+        input_check <- checkHSRevisionYearAndDigitsForInputYear(hs_rev_year,
+                                                                hs_digits,
+                                                                input_year)
+
+        if (input_check == FALSE) {
+            return(NULL)
+        }
+
         raw_exports_panel <- loadOECExportsPanel(hs_rev_year, hs_digits)
+
     } else if (name == "baci") {
         ## Note that if we choose BACI data we ignore hs_rev_year here.
         raw_exports_panel <- loadBACIExportsPanel()
