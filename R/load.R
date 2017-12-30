@@ -1,3 +1,22 @@
+#' Get Valid Input Years For HS Revision Year
+#'
+#' \code{getValidInputYearsForHSRevisionYear} is a convenience function
+#' to get the appropriate input years existing in OEC data for a given HS
+#' revision year.
+#'
+#' @param hs_rev_year HS coding scheme revision year (can be "1992", "1996",
+#' "2002", or "2007").
+
+getValidInputYearsForHSRevisionYear <- function(hs_rev_year) {
+
+    switch(hs_rev_year,
+           "1992" = seq(1998, 2000),
+           "1996" = seq(2001, 2014),
+           "2002" = seq(2006, 2014),
+           "2007" = seq(2011, 2014))
+
+}
+
 #' Check HS Product Coding Request
 #'
 #' \code{checkHSRevisionYearAndDigits} is a convenience function to make sure
@@ -34,7 +53,7 @@ checkHSRevisionYearAndDigits <- function(hs_rev_year, hs_digits) {
 #' "2002", or "2007").
 #' @param hs_digits Number of digits in HS coding scheme (can be "4" or "6").
 #' @param input_year Requested integer input year.
-#' @return TRUE if requested HS coding scheme is valid, FALSE otherwise.
+#' @return TRUE if requested data is valid, FALSE otherwise.
 
 checkHSRevisionYearAndDigitsForInputYear <- function(hs_rev_year, hs_digits, input_year) {
 
@@ -44,17 +63,14 @@ checkHSRevisionYearAndDigitsForInputYear <- function(hs_rev_year, hs_digits, inp
         return(FALSE)
     }
 
-    valid_input_years <- switch(hs_rev_year,
-                                "1992" = seq(1998, 2000),
-                                "1996" = seq(2001, 2014),
-                                "2002" = seq(2006, 2014),
-                                "2007" = seq(2011, 2014))
+    valid_input_years <- getValidInputYearsForHSRevisionYear(hs_rev_year)
 
     if (input_year %in% valid_input_years) {
         return(TRUE)
     } else {
         return(FALSE)
     }
+
 }
 
 #' Download Export Data From OEC
