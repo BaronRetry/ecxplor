@@ -589,7 +589,7 @@ runModelForAllOECData <- function() {
         }
     }
 
-    for (hs_rev in c("1992", "1996")) {
+    for (hs_rev in c("1996")) {
         for (hs_digits in c("4", "6")) {
             for (input_year in seq(2001, 2014)) {
                 runModel("oec", hs_rev, hs_digits, input_year, FALSE)
