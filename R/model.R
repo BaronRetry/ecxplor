@@ -508,10 +508,10 @@ getModelDescriptor <- function(data_tag, product_code_rev, product_code_digit, i
 
 }
 
-#' Load Model
+#' Download Model
 #'
-#' \code{loadModel} loads the appropriate model from disk, or returns NULL if
-#' it doesn't exist.
+#' \code{loadModel} downloads the appropriate model from talentedco.in, or
+#' returns NULL if it doesn't exist.
 #'
 #' @param data_tag Dataset to use (can be "baci" or "oec").
 #' @param product_code_rev HS coding scheme revision year (can be "1992", "1996",
@@ -522,26 +522,52 @@ getModelDescriptor <- function(data_tag, product_code_rev, product_code_digit, i
 #'
 #' @export
 
-loadModel <- function(data_tag, product_code_rev, product_code_digit, input_year, ab_flag) {
+downloadModel <- function(data_tag, product_code_rev, product_code_digit, input_year, ab_flag) {
+
+    base_url <- "http://talentedco.in/Data/ecxplor/"
+
+    model_descriptor <- getModelDescriptor(data_tag, product_code_rev, product_code_digit, input_year, ab_flag)
+    model_filename <- paste0(model_descriptor, ".RData")
+
+
+    model_file_url <- paste0(base_url, model_filename)
+    download.file(model_file_url, file.path(path.package("ecxplor"),
+                                                "data",
+                                                model_filename))
+
+
+}
+
+#' Load Model Object
+#'
+#' \code{loadModel} downloads the appropriate model from talentedco.in, if it
+#' isn't present in the /data folder, and returns the result as a model object.
+#'
+#' @param data_tag Dataset to use (can be "baci" or "oec").
+#' @param product_code_rev HS coding scheme revision year (can be "1992", "1996",
+#' "2002", or "2007").
+#' @param product_code_digit Number of digits in HS coding scheme (can be "4" or "6").
+#' @param input_year Year for which to run model (e.g. 2001, 2006).
+#' @param ab_flag = TRUE (include AB data) or FALSE
+#'
+#' @export
+
+loadModelObject <- function(data_tag, product_code_rev, product_code_digit, input_year, ab_flag) {
 
     model_descriptor <- getModelDescriptor(data_tag, product_code_rev, product_code_digit, input_year, ab_flag)
 
     storage_file_path <- file.path(path.package("ecxplor"), "data", paste0(model_descriptor, ".RData"))
 
-    print(storage_file_path)
-
-    if (file.exists(storage_file_path)) {
-
-        env <- new.env()
-        load(storage_file_path, envir = env)
-        loaded_objs <- objects(env, all.names = TRUE)
-        stopifnot(length(loaded_objs) == 1)
-        return(env[[loaded_objs]])
-
-    } else {
-        print(paste0("Couldn't find model file: ", model_descriptor))
-        return(NULL)
+    if (!(file.exists(storage_file_path))) {
+        downloadModel(data_tag, product_code_rev, product_code_digit, input_year, ab_flag)
     }
+
+    env <- new.env()
+    load(storage_file_path, envir = env)
+    loaded_objs <- objects(env, all.names = TRUE)
+    stopifnot(length(loaded_objs) == 1)
+
+    return(env[[loaded_objs]])
 
 }
 

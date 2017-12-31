@@ -3,7 +3,7 @@ library(ecxplor)
 library(networkD3)
 library(shiny)
 
-model_obj <- loadModel("baci", "2007", "6", 2014, TRUE)
+model_obj <- loadModelObject("baci", "2007", "6", 2014, TRUE)
 
 choices <- rownames(model_obj[["proximity"]])
 choices_panel <- tbl_df(data.frame(product = choices,
