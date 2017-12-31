@@ -534,7 +534,7 @@ loadModel <- function(data_tag, product_code_rev, product_code_digit, input_year
 
         env <- new.env()
         load(storage_file_path, envir = env)
-        loaded_objs <- objects(env, all = TRUE)
+        loaded_objs <- objects(env, all.names = TRUE)
         stopifnot(length(loaded_objs) == 1)
         return(env[[loaded_objs]])
 
