@@ -510,7 +510,7 @@ getModelDescriptor <- function(data_tag, product_code_rev, product_code_digit, i
 
 #' Download Model
 #'
-#' \code{loadModel} downloads the appropriate model from talentedco.in, or
+#' \code{downloadModel} downloads the appropriate model from talentedco.in, or
 #' returns NULL if it doesn't exist.
 #'
 #' @param data_tag Dataset to use (can be "baci" or "oec").
