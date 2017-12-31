@@ -471,19 +471,72 @@ runModel <- function(data_tag, product_code_rev, product_code_digit, input_year,
     model_obj[["opportunity"]] <- outlook
     model_obj[["opportunity_gain"]] <- outlook_gain
 
+    model_descriptor <- getModelDescriptor(data_tag, product_code_rev, product_code_digit, input_year, ab_flag)
+
+    save(model_obj, file = file.path(path.package("ecxplor"), "data",
+                                    paste0(model_descriptor, ".RData")))
+
+    return(model_obj)
+
+}
+
+#' Get Model Descriptor
+#'
+#' \code{getModelDescriptor} returns an appropriate file descriptor for the requested
+#' model.
+#'
+#' @param data_tag Dataset to use (can be "baci" or "oec").
+#' @param product_code_rev HS coding scheme revision year (can be "1992", "1996",
+#' "2002", or "2007").
+#' @param product_code_digit Number of digits in HS coding scheme (can be "4" or "6").
+#' @param input_year Year for which to run model (e.g. 2001, 2006).
+#' @param ab_flag = TRUE (include AB data) or FALSE
+#'
+#' @export
+
+getModelDescriptor <- function(data_tag, product_code_rev, product_code_digit, input_year, ab_flag) {
+
     model_descriptor <- ""
 
     if (ab_flag == TRUE) {
         model_descriptor <- paste(data_tag, product_code_rev, product_code_digit, input_year, "ab", sep = "_")
     } else {
         model_descriptor <- paste(data_tag, product_code_rev, product_code_digit, input_year, sep = "_")
-
     }
 
-    save(model_obj, file = file.path(path.package("ecxplor"), "data",
-                                    paste0(model_descriptor, ".RData")))
+    return(model_descriptor)
 
-    return(model_obj)
+}
+
+#' Load Model
+#'
+#' \code{loadModel} loads the appropriate model from disk, or returns NULL if
+#' it doesn't exist.
+#'
+#' @param data_tag Dataset to use (can be "baci" or "oec").
+#' @param product_code_rev HS coding scheme revision year (can be "1992", "1996",
+#' "2002", or "2007").
+#' @param product_code_digit Number of digits in HS coding scheme (can be "4" or "6").
+#' @param input_year Year for which to run model (e.g. 2001, 2006).
+#' @param ab_flag = TRUE (include AB data) or FALSE
+#'
+#' @export
+
+loadModel <- function(data_tag, product_code_rev, product_code_digit, input_year, ab_flag) {
+
+    model_descriptor <- getModelDescriptor(data_tag, product_code_rev, product_code_digit, input_year, ab_flag)
+
+    storage_file_path <- file.path(path.package("ecxplor"), "data", paste0(model_descriptor, ".RData"))
+
+    print(storage_file_path)
+
+    if (file.exists(storage_file_path)) {
+        stored_model <- load(storage_file_path)
+        return(stored_model)
+    } else {
+        print(paste0("Couldn't find model file: ", model_descriptor))
+        return(NULL)
+    }
 
 }
 

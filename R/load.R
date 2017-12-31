@@ -513,15 +513,22 @@ loadExportsPanel <- function(name, hs_rev_year, hs_digits, input_year, ab_flag) 
         raw_exports_panel <- loadOECExportsPanel(hs_rev_year, hs_digits)
 
     } else if (name == "baci") {
+
         ## Note that if we choose BACI data we ignore hs_rev_year here.
+
         raw_exports_panel <- loadBACIExportsPanel()
+
     }
 
     if (ab_flag == TRUE) {
+
         ab_panel <- loadAlbertaExportsPanel()
         target_panel <- rbind(raw_exports_panel, ab_panel)
+
     } else {
+
         target_panel <- raw_exports_panel
+
     }
 
     ## Only here do we use input_year to determine min_year and apply the filter.
