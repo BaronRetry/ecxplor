@@ -173,8 +173,8 @@ prepareFocusedModelObject <- function(model_object, focus_product_code, n_search
     nodes_panel <- model_network_result[["nodes"]]
     edges_panel <- model_network_result[["edges"]]
 
-    product_info_panel <- loadOECProductsInfoPanel(hs_rev_year, hs_rev_digit)
-    countries_info_panel <- loadBACICountriesInfoPanel()
+    product_info_panel <- model_object$products_info
+    countries_info_panel <- model_object$countries_info
 
     edges_d3 <- data.frame(from = as.numeric(factor(edges_panel$from)) - 1,
                            to = as.numeric(factor(edges_panel$to)) - 1 )

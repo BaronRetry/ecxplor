@@ -445,13 +445,13 @@ runModel <- function(data_tag, product_code_rev, product_code_digit, input_year,
     model_obj[["data_tag"]] <- data_tag
 
     if (data_tag == "oec") {
-        model_obj[["product_info"]] <- loadOECProductsInfoPanel(product_code_rev, product_code_digit) %>%
+        model_obj[["products_info"]] <- loadOECProductsInfoPanel(product_code_rev, product_code_digit) %>%
             filter(product %in% rownames(phi))
-        model_obj[["country_info"]] <- loadOECCountriesInfoPanel()
+        model_obj[["countries_info"]] <- loadOECCountriesInfoPanel()
     } else if (data_tag == "baci") {
-        model_obj[["product_info"]] <- loadOECProductsInfoPanel(product_code_rev, product_code_digit) %>%
+        model_obj[["products_info"]] <- loadOECProductsInfoPanel(product_code_rev, product_code_digit) %>%
             filter(product %in% rownames(phi))
-        model_obj[["country_info"]] <- loadBACICountriesInfoPanel()
+        model_obj[["countries_info"]] <- loadBACICountriesInfoPanel()
     } else {
 
     }
