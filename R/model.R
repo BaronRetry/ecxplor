@@ -540,8 +540,9 @@ downloadModel <- function(data_tag, product_code_rev, product_code_digit, input_
 
 #' Load Model Object
 #'
-#' \code{loadModel} downloads the appropriate model from talentedco.in, if it
-#' isn't present in the /data folder, and returns the result as a model object.
+#' \code{loadModelObject} downloads the appropriate model from talentedco.in, if
+#' it isn't present in the /data folder, and returns the result as a model
+#' object.
 #'
 #' @param data_tag Dataset to use (can be "baci" or "oec").
 #' @param product_code_rev HS coding scheme revision year (can be "1992", "1996",
