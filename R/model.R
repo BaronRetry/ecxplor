@@ -531,8 +531,13 @@ loadModel <- function(data_tag, product_code_rev, product_code_digit, input_year
     print(storage_file_path)
 
     if (file.exists(storage_file_path)) {
-        stored_model <- load(storage_file_path)
-        return(stored_model)
+
+        env <- new.env()
+        load(storage_file_path, envir = env)
+        loaded_objs <- objects(env, all = TRUE)
+        stopifnot(length(loaded_objs) == 1)
+        return(env[[loaded_objs]])
+
     } else {
         print(paste0("Couldn't find model file: ", model_descriptor))
         return(NULL)
