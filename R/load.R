@@ -248,7 +248,7 @@ loadOECProductsInfoPanel <- function(hs_rev_year, hs_digits) {
         digit_products <- products_panel[["product"]][nchar(products_panel[["product"]]) == 6]
     }
 
-    nice_products_panel <- products_panel[products_panel["product"] == digit_products, ]
+    nice_products_panel <- products_panel %>% filter(product %in% digit_products)
 
     return(nice_products_panel)
 
