@@ -96,7 +96,7 @@ downloadOECExports <- function(hs_rev_year, hs_digits) {
                                 ".tsv.bz2")
 
     oec_data_url <- paste0(oec_base_url,
-                           "/static/db/raw/",
+                           "static/db/raw/",
                            oec_data_filename)
 
     download.file(url = oec_data_url, destfile = file.path(path.package("ecxplor"),
