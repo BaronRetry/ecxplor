@@ -169,7 +169,6 @@ prepareFocusedModelObject <- function(model_object, focus_product_code, n_search
 
     model_network_result <- makeFocusedNetworkFromModel(model_object, focus_product_code, n_search_depth)
 
-
     nodes_panel <- model_network_result[["nodes"]]
     edges_panel <- model_network_result[["edges"]]
 
@@ -177,7 +176,8 @@ prepareFocusedModelObject <- function(model_object, focus_product_code, n_search
     countries_info_panel <- model_object$countries_info
 
     edges_d3 <- data.frame(from = as.numeric(factor(edges_panel$from)) - 1,
-                           to = as.numeric(factor(edges_panel$to)) - 1 )
+                           to = as.numeric(factor(edges_panel$to)) - 1,
+                           weight = as.numeric(edges_panel$weight))
 
     nodes_d3 <- cbind(idn = factor(nodes_panel$from,
                                    levels = nodes_panel$from),
@@ -192,6 +192,8 @@ prepareFocusedModelObject <- function(model_object, focus_product_code, n_search
     result[["d3_nodes"]] <- nodes_d3
     result[["d3_edges"]] <- edges_d3
     result[["product_info"]] <- product_info_panel
+
+    print(result)
 
     return(result)
 

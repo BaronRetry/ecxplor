@@ -1,15 +1,14 @@
-library(ecxplor)
-
 library(networkD3)
 library(shiny)
 
-model_obj <- loadModelObject("baci", "2007", "6", 2014, TRUE)
+library(ecxplor)
+library(ecxplorappdata)
 
-choices <- rownames(model_obj[["proximity"]])
+choices <- rownames(ecxplorappdata::model_obj[["proximity"]])
 choices_panel <- tbl_df(data.frame(product = choices,
                                    stringsAsFactors = FALSE))
 
-product_info_panel <- model_obj[["product_info"]]
+product_info_panel <- ecxplorappdata::model_obj[["products_info"]]
 
 choices_info_panel <- tbl_df(merge(choices_panel, product_info_panel, all.x = TRUE))
 choices_to_display <- choices_info_panel[["product"]]
@@ -20,7 +19,7 @@ named_choices_to_display <- choices_to_display[!is.na(names(choices_to_display))
 names(unnamed_choices_to_display) <- unnamed_choices_to_display
 final_choices_to_display <- c(named_choices_to_display, unnamed_choices_to_display)
 
-exports_panel <- model_obj[["exports"]]
+exports_panel <- ecxplorappdata::model_obj[["exports"]]
 
 ui <- fluidPage(
 
@@ -66,12 +65,13 @@ server <- function(input, output) {
     })
 
     output$product_space_plot <- renderForceNetwork(        {
-            prepared_model <- prepareFocusedModelObject(model_obj, input$focus_product, input$search_depth)
+            prepared_model <- prepareFocusedModelObject(ecxplorappdata::model_obj, input$focus_product, input$search_depth)
             forceNetwork(Links = prepared_model[["d3_edges"]],
                          Nodes = prepared_model[["d3_nodes"]],
-                         Source="from",
-                         Target="to",
-                         Group="from",
+                         Source = "from",
+                         Target = "to",
+                         Value = "weight",
+                         Group = "from",
                          NodeID = "idn",
                          linkWidth = 1,
                          linkColour = "#afafaf",
