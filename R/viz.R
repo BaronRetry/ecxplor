@@ -177,7 +177,7 @@ prepareFocusedModelObject <- function(model_object, focus_product_code, n_search
 
     edges_d3 <- data.frame(from = as.numeric(factor(edges_panel$from)) - 1,
                            to = as.numeric(factor(edges_panel$to)) - 1,
-                           weight = as.numeric(edges_panel$weight))
+                           weight = as.integer(100 * edges_panel$weight))
 
     nodes_d3 <- cbind(idn = factor(nodes_panel$from,
                                    levels = nodes_panel$from),
@@ -192,8 +192,6 @@ prepareFocusedModelObject <- function(model_object, focus_product_code, n_search
     result[["d3_nodes"]] <- nodes_d3
     result[["d3_edges"]] <- edges_d3
     result[["product_info"]] <- product_info_panel
-
-    print(result)
 
     return(result)
 
