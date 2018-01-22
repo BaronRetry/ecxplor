@@ -4,6 +4,9 @@ library(shiny)
 library(ecxplor)
 library(ecxplorappdata)
 
+## Prepare data for visualization.
+## Dataset is assumed to be loaded from the ecxplorappdata package.
+
 choices <- rownames(ecxplorappdata::model_obj[["proximity"]])
 choices_panel <- tbl_df(data.frame(product = choices,
                                    stringsAsFactors = FALSE))
@@ -20,6 +23,11 @@ names(unnamed_choices_to_display) <- unnamed_choices_to_display
 final_choices_to_display <- c(named_choices_to_display, unnamed_choices_to_display)
 
 exports_panel <- ecxplorappdata::model_obj[["exports"]]
+
+## Uncomment the following line to output results to the current working directory:
+## generateBasicOutput(ecxplorappdata::model_obj)
+
+## Actual shiny app starts here.
 
 ui <- fluidPage(
 

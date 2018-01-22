@@ -8,21 +8,12 @@
 
 generateBasicOutput <- function(model) {
 
-    country_info_panel <- list()
-
     data_tag <- model[["data_tag"]]
-
-    if (data_tag == "baci") {
-        country_info_panel <- loadBACICountriesInfoPanel()
-    }
-
     product_code_rev <- model[["product_code_rev"]]
     product_code_digit <- model[["product_code_digit"]]
     input_year <- model[["input_year"]]
-
-
-    product_info_panel <- loadOECProductsInfoPanel(product_code_rev, product_code_digit)
-
+    countries_info_panel <- model[["countries_info"]]
+    products_info_panel <- model[["products_info"]]
     exports_panel <- model[["exports"]]
 
     lag0_year <- input_year
@@ -52,19 +43,18 @@ generateBasicOutput <- function(model) {
     product_codes <- dimnames_m[[2]]
 
     country_codes_panel <- tbl_df(data.frame(country = country_codes,
-                                            stringsAsFactors = FALSE))
+                                             stringsAsFactors = FALSE))
 
     product_codes_panel <- tbl_df(data.frame(product = product_codes,
-                                            stringsAsFactors = FALSE))
+                                             stringsAsFactors = FALSE))
 
-    nice_panel <- merge(exports_all_panel, country_info_panel, by = c("country"), all.x = TRUE)
-    nice_panel <- merge(nice_panel, product_info_panel, by = c("product"), all.x = TRUE)
+    nice_panel <- merge(exports_all_panel, countries_info_panel, by = c("country"), all.x = TRUE)
+    nice_panel <- merge(nice_panel, products_info_panel, by = c("product"), all.x = TRUE)
     nice_panel <- merge(nice_panel, exports_lag2_panel, by = c("country", "product"), all.x = TRUE)
     nice_panel <- merge(nice_panel, exports_lag1_panel, by = c("country", "product"), all.x = TRUE)
     nice_panel <- merge(nice_panel, exports_lag0_panel, by = c("country", "product"), all.x = TRUE)
 
     nice_panel[is.na(nice_panel)] <- 0
-
 
     distance <- model[["distance"]]
 
@@ -95,9 +85,6 @@ generateBasicOutput <- function(model) {
     product_total_panel <- nice_panel %>% group_by(product) %>%
         summarize_each_(funs(sum), sum_names)
 
-    ## product_total_panel <- nice_panel %>% group_by(product) %>%
-    ##     summarize(export_val_2013 = sum(export_val_2013))
-
 
     eci <- model[["eci"]]
     eci_panel <- tbl_df(data.frame(country = names(eci),
@@ -112,7 +99,7 @@ generateBasicOutput <- function(model) {
 
 
     nice_country_panel <- tbl_df(merge(eci_panel, country_total_panel, all.x = TRUE))
-    nice_country_panel <- tbl_df(merge(nice_country_panel, country_info_panel, all.x = TRUE))
+    nice_country_panel <- tbl_df(merge(nice_country_panel, countries_info_panel, all.x = TRUE))
     nice_country_panel <- tbl_df(merge(nice_country_panel, opportunity_panel, all.x = TRUE))
 
 
@@ -121,7 +108,7 @@ generateBasicOutput <- function(model) {
                                    pci = pci,
                                    stringsAsFactors = FALSE))
 
-    ab_exports_panel <- loadAlbertaExportsPanel()
+    ab_exports_panel <- exports_panel %>% filter(country == "zalta")
 
     ab_exports_lag0_panel <- ab_exports_panel %>% filter(year == lag0_year) %>%
         rename_(.dots = setNames(list("export_val"), paste0("ab_export_val_", lag0_year))) %>%
@@ -138,13 +125,12 @@ generateBasicOutput <- function(model) {
     ab_gain_panel <- gain_panel %>% filter(country == "zalta") %>%
         select(-one_of("country"))
 
-    nice_product_panel <- tbl_df(merge(product_total_panel, product_info_panel, all.x = TRUE))
+    nice_product_panel <- tbl_df(merge(product_total_panel, products_info_panel, all.x = TRUE))
     nice_product_panel <- tbl_df(merge(nice_product_panel, pci_panel, all.x = TRUE))
     nice_product_panel <- tbl_df(merge(nice_product_panel, ab_exports_lag2_panel, all.x = TRUE))
     nice_product_panel <- tbl_df(merge(nice_product_panel, ab_exports_lag1_panel, all.x = TRUE))
     nice_product_panel <- tbl_df(merge(nice_product_panel, ab_exports_lag0_panel, all.x = TRUE))
     nice_product_panel <- tbl_df(merge(nice_product_panel, ab_gain_panel, all.x = TRUE))
-
 
     model_tag <- paste0(data_tag, "-", product_code_rev, "-", product_code_digit, ", ", input_year)
 
