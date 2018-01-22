@@ -36,8 +36,8 @@ ui <- fluidPage(
             sliderInput(inputId = "search_depth",
                         label = "Search depth:",
                         min = 1,
-                        max = 1000,
-                        value = 50)
+                        max = 250,
+                        value = 12)
 
         ),
 
